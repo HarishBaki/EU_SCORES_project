@@ -42,3 +42,4 @@ def solar_power(ws,swdown,t2,Epv):
     Spv = swdown * Epv * PR
     Spv = xr.DataArray(Spv.astype('float32'),name='PVO')
     return Spv
+
