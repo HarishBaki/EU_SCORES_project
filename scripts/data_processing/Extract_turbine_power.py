@@ -10,32 +10,16 @@ import sys
 import calendar
 from datetime import datetime, timedelta
 import numpy as np
-import wrf
-from itertools import product
-
-from dask.diagnostics import ProgressBar
 
 import dask.distributed as dd
 import dask
 import dask.array as da
 
-def turbine_power(wind,turbine_type=None):
-    # Fix the spline approximation
-    from scipy.interpolate import UnivariateSpline
-    if turbine_type == '15MW':
-        power_curve = pd.read_csv(f'{root_dir}/eval/IEA_15MW_240_RWT.csv', usecols=range(0, 2))
-        spline = UnivariateSpline(power_curve.iloc[:,0],power_curve.iloc[:,1])
-        power = spline(wind)
-        power = xr.where(((wind>=3) & (wind<= 25)), power, 0)   #change it to np.where, if you encounter any error
-    elif turbine_type == '8MW':
-        power_curve = pd.read_csv(f'{root_dir}/eval/LEANWIND_8MW_164_RWT.csv', usecols=range(0, 2))
-        spline = UnivariateSpline(power_curve.iloc[:,0],power_curve.iloc[:,1])
-        power = spline(wind)
-        power = xr.where(((wind>=4) & (wind<= 25)), power, 0)   #change it to np.where, if you encounter any error
+root_dir = '/media/harish/SSD_4TB/EU_SCORES_project'
+scripts_dir = f'{root_dir}/scripts'
+sys.path.append(scripts_dir)
 
-    #Convert the power array to float32 and change it to xarray DataArray
-    power = xr.DataArray(power.astype('float32'),name='power')
-    return power
+from data_processing.libraries import turbine_power
 
 if __name__ == "__main__":
 	
@@ -52,8 +36,7 @@ if __name__ == "__main__":
 	level = int(sys.argv[3])
 	turbine_type = str(sys.argv[4])
 
-	root_dir = '/media/harish/SSD_4TB/EU_SCORES'
-	run_dir=f'{root_dir}/{run}/{case}/Postprocessed/variablewise_files'
+	run_dir=f'{root_dir}/WRFV4.4/EU_SCORES/{run}/{case}/Postprocessed/variablewise_files'
 	os.system(f'mkdir -p {run_dir}/{turbine_type}')
 	target_file = f'{run_dir}/{turbine_type}/tp_{level}.nc'
 
@@ -62,7 +45,7 @@ if __name__ == "__main__":
 	chunks={"Time": 240,"south_north": -1,"west_east": -1}
 	ws = xr.open_dataset(f'{run_dir}/ws_{level}.nc',chunks=chunks)['ws']
 	
-	chunksize = 7200
+	chunksize = 72000
 	# first chunk computation 
 	i = 0
 	start = time.time()

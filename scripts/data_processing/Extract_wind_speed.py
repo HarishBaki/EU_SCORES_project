@@ -1,49 +1,32 @@
 import xarray as xr
-import os
-import glob
 import dask.distributed as dd
-import dask
-import dask.array as da
 import time
 import sys
-import calendar
-from datetime import datetime, timedelta
 import numpy as np
-import wrf
-from itertools import product
-
-from dask.diagnostics import ProgressBar
-
 import dask.distributed as dd
-import dask
-import dask.array as da
+import os, sys
 
-def wind_speed(root_dir,var1,var2,level=None,chunks=None):
-    if level:
-        ds1 = xr.open_dataset(f'{root_dir}/{var1}_{level}.nc',chunks=chunks)
-        ds2 = xr.open_dataset(f'{root_dir}/{var2}_{level}.nc',chunks=chunks)
-    else:
-        ds1 = xr.open_dataset(f'{root_dir}/{var1}.nc',chunks=chunks)
-        ds2 = xr.open_dataset(f'{root_dir}/{var2}.nc',chunks=chunks)
-    ws = xr.DataArray(np.sqrt(ds1[var1]**2 + ds2[var2]**2), name='ws')
-    return ws 
+root_dir = '/media/harish/SSD_4TB/EU_SCORES_project'
+scripts_dir = f'{root_dir}/scripts'
+sys.path.append(scripts_dir)
+
+from data_processing.libraries import wind_speed
 
 if __name__ == "__main__":
 	
 	start = time.time()
 	# Create a Dask cluster
 	print("Starting parallel computing...")
-	cluster = dd.LocalCluster(n_workers=24, dashboard_address=':22722')
+	cluster = dd.LocalCluster(n_workers=12, dashboard_address=':22722')
 
 	# Connect to the cluster
 	client = dd.Client(cluster)
-	
+
 	run = sys.argv[1]
 	case = sys.argv[2]
 	level = int(sys.argv[3])
 	
-	root_dir = '/media/harish/SSD_4TB/EU_SCORES'
-	run_dir=f'{root_dir}/{run}/{case}/Postprocessed/variablewise_files'
+	run_dir=f'{root_dir}/WRFV4.4/EU_SCORES/{run}/{case}/Postprocessed/variablewise_files'
 	target_name = f'ws_{level}'
 	
 	if level == 10:
@@ -56,7 +39,14 @@ if __name__ == "__main__":
 	print(run_dir,target_name,var1,var2)
 	
 	chunks={"Time": 3600,"south_north": -1,"west_east": -1}
-	ws = wind_speed(run_dir,var1,var2,level=level,chunks=chunks)
+	if level:
+		ds1 = xr.open_dataset(f'{run_dir}/{var1}_{level}.nc',chunks=chunks)[var1]
+		ds2 = xr.open_dataset(f'{run_dir}/{var2}_{level}.nc',chunks=chunks)[var2]
+	else:
+		ds1 = xr.open_dataset(f'{run_dir}/{var1}.nc',chunks=chunks)[var1]
+		ds2 = xr.open_dataset(f'{run_dir}/{var2}.nc',chunks=chunks)[var2]
+	
+	ws = wind_speed(ds1,ds2)
 
 	XLAND = xr.open_dataset(f'{run_dir}/XLAND.nc')
 	XLAT = XLAND.XLAT

@@ -10,7 +10,6 @@ import sys
 import calendar
 from datetime import datetime, timedelta
 import numpy as np
-import wrf
 from itertools import product
 
 from dask.diagnostics import ProgressBar
@@ -19,22 +18,11 @@ import dask.distributed as dd
 import dask
 import dask.array as da
 
-def solar_power(ws,swdown,t2,Epv):
-    # Based on Rui Chang et. al., 2022, A coupled WRF-PV mesoscale model simulating the near-surface climate of utility-scale photovoltaic plants
-    # Based on https://www.sciencedirect.com/science/article/pii/S0959652623011551#sec2
-    c1 = 4.3 # degC
-    c2 = 0.943 # No units
-    c3 = 0.028 # degC.m2.W-1
-    c4 = -1.528 # degC.s.m-1
-    gamma = - 0.005 # degC-1   
-    
-    Tcell = c1 + c2*t2 + c3*swdown + c4*ws
-    Tref = 25
+root_dir = '/media/harish/SSD_4TB/EU_SCORES_project'
+scripts_dir = f'{root_dir}/scripts'
+sys.path.append(scripts_dir)
 
-    PR = 1 + gamma * (Tcell - Tref) 
-    Spv = swdown * Epv * PR
-    Spv = xr.DataArray(Spv.astype('float32'),name='PVO')
-    return Spv
+from data_processing.libraries import solar_power
 
 if __name__ == "__main__":
 	
@@ -50,8 +38,7 @@ if __name__ == "__main__":
 	case = sys.argv[2]
 	Epv = 0.216
 
-	root_dir = '/media/harish/SSD_4TB/EU_SCORES'
-	run_dir=f'{root_dir}/{run}/{case}/Postprocessed/variablewise_files'
+	run_dir=f'{root_dir}/WRFV4.4/EU_SCORES/{run}/{case}/Postprocessed/variablewise_files'
 	target_file = f'{run_dir}/spv.nc'
 
 	print(run_dir,target_file)
@@ -68,7 +55,7 @@ if __name__ == "__main__":
 	swdown = xr.open_dataset(f'{run_dir}/SWDOWN2.nc',chunks=chunks)
 	swdown = swdown['SWDOWN2'].assign_coords(XLAT=XLAT,XLONG=XLONG)
 	
-	chunksize = 7200
+	chunksize = 72000
 	# first chunk computation 
 	i = 0
 	start = time.time()
