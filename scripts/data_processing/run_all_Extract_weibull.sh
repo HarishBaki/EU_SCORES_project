@@ -3,8 +3,8 @@ root_dir='/media/harish/SSD_4TB/EU_SCORES_project'
 run='New_runs'
 case='Germany_coast'
 levels=(10) # 80 100 120 150)
-I=(0 1 2)
-J=(0 1 2)
+I=($(seq 0 9))
+J=($(seq 0 9))
 for level in "${levels[@]}"; do
 	mkdir -p $root_dir/WRFV4.4/EU_SCORES/$run/$case/Postprocessed/variablewise_files/weibull_$level
 	for i in "${I[@]}"; do
@@ -14,4 +14,5 @@ for level in "${levels[@]}"; do
 		done
 	done
 done
+wait
 echo "Script execution complete."
