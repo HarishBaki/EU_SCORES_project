@@ -1,6 +1,7 @@
 import xarray as xr
 import pandas as pd
 import numpy as np
+from scipy.stats import weibull_min
 
 root_dir = '/media/harish/SSD_4TB/EU_SCORES_project'
 
@@ -43,3 +44,10 @@ def solar_power(ws,swdown,t2,Epv):
     Spv = xr.DataArray(Spv.astype('float32'),name='PVO')
     return Spv
 
+def weibull(data):
+    data = data
+    data = np.where(data == 0, np.nan, data)
+    data = data[~np.isnan(data)]
+    data = np.sort(data)
+    shape, _, scale = weibull_min.fit(data, floc=0)
+    return shape, scale
