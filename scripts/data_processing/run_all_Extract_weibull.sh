@@ -2,7 +2,7 @@
 root_dir='/media/harish/SSD_4TB/EU_SCORES_project'
 run='New_runs'
 cases=('Germany_coast') # 'Portugal_coast' 'Ireland_coast' 'Netherlands_coast')
-levels=(80) #100 120 150)
+levels=(80 100 120 150)
 south_north_grids=(63 127 127 199)
 west_east_grids=(63 127 127 199)
 # Loop over cases

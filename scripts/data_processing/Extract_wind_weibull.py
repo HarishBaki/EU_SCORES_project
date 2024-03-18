@@ -60,7 +60,7 @@ def calculate_weibull(i,j):
 
     weibull_dataset.to_netcdf(f'{target_dir}/{i}_{j}.nc')
     
-    print(f'{i}_{j} done in {time.time()-start} seconds')
+    #print(f'{i}_{j} done in {time.time()-start} seconds')
 
 if __name__ == '__main__':
     calculate_weibull(i,j)
