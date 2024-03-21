@@ -1,10 +1,10 @@
 #conda activate wrf-python-stable
 root_dir='/media/harish/SSD_4TB/EU_SCORES_project'
 run='New_runs'
-cases=('Ireland_coast') # 'Netherlands_coast')
-levels=(100 120 150)
-south_north_grids=(127 127 199)
-west_east_grids=(127 127 199)
+cases=('Germany_coast' 'Ireland_coast' 'Portugal_coast' 'Netherlands_coast')
+levels=(10 80 100 120 150)
+south_north_grids=(63 127 127 199)
+west_east_grids=(63 127 127 199)
 # Loop over cases
 for ((case_index=0; case_index<${#cases[@]}; case_index++)); do
     case="${cases[$case_index]}"
@@ -23,7 +23,7 @@ for ((case_index=0; case_index<${#cases[@]}; case_index++)); do
                 count=$((count+1))
                 echo "Processing $case, $level, $i, $j"
                 python "$root_dir/scripts/data_processing/Extract_wind_weibull.py" "$run" "$case" "$level" "$i" "$j" &
-                if [ $count -eq 98 ]; then
+                if [ $count -eq 96 ]; then
                     echo "Processing waits at $i, $j"
                     wait
                     count=0
@@ -37,7 +37,7 @@ for ((case_index=0; case_index<${#cases[@]}; case_index++)); do
         for ((i=0; i<$south_north; i++)); do
             python "$root_dir/scripts/data_processing/Combine_weibull.py" "$run" "$case" "$level" "$i" "0" "0" "$west_east" &
             count=$((count+1))
-            if [ $count -eq 98 ]; then
+            if [ $count -eq 96 ]; then
                 echo "Processing waits at $i"
                 wait
                 count=0
