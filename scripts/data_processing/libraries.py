@@ -51,3 +51,30 @@ def weibull(data):
     data = np.sort(data)
     shape, _, scale = weibull_min.fit(data, floc=0)
     return shape, scale
+
+def mean_statistics(data):
+    statistics = xr.Dataset()
+    statistics['hourly_values'] = data.groupby('Time.hour').mean(dim='Time').compute()
+    statistics['monthly_values'] = data.groupby('Time.month').mean(dim='Time').compute()
+    statistics['yearly_values'] = data.groupby('Time.year').mean(dim='Time').compute()
+    statistics['overall_values'] = data.mean(dim='Time').compute()
+
+    return statistics
+
+def std_statistics(data):
+    statistics = xr.Dataset()
+    statistics['hourly_values'] = data.groupby('Time.hour').std(dim='Time').compute()
+    statistics['monthly_values'] = data.groupby('Time.month').std(dim='Time').compute()
+    statistics['yearly_values'] = data.groupby('Time.year').std(dim='Time').compute()
+    statistics['overall_values'] = data.std(dim='Time').compute()
+
+    return statistics
+
+def quantile_statistics(data,quantile):
+    statistics = xr.Dataset()
+    statistics['hourly_values'] = data.groupby('Time.hour').quantile(quantile,dim='Time',method='inverted_cdf').compute()
+    statistics['monthly_values'] = data.groupby('Time.month').quantile(quantile,dim='Time',method='inverted_cdf').compute()
+    statistics['yearly_values'] = data.groupby('Time.year').quantile(quantile,dim='Time',method='inverted_cdf').compute()
+    statistics['overall_values'] = data.quantile(quantile,dim='Time',method='inverted_cdf').compute()
+
+    return statistics
