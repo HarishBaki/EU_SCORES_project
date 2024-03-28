@@ -3,17 +3,22 @@ root_dir='/media/harish/SSD_4TB/EU_SCORES_project'
 run='New_runs'
 cases=('Germany_coast' 'Ireland_coast' 'Portugal_coast' 'Netherlands_coast')
 levels=(10 80 100 120 150)
+
 south_north_grids=(63 127 127 199)
 west_east_grids=(63 127 127 199)
 # Loop over cases
 for ((case_index=0; case_index<${#cases[@]}; case_index++)); do
     case="${cases[$case_index]}"
+    mkdir -p "$root_dir/WRFV4.4/EU_SCORES/$run/$case/Postprocessed/statistics_files"
+    
     south_north="${south_north_grids[$case_index]}"
     west_east="${west_east_grids[$case_index]}"
     
     # Loop over levels
     for level in "${levels[@]}"; do
-        mkdir -p "$root_dir/WRFV4.4/EU_SCORES/$run/$case/Postprocessed/variablewise_files/weibull_$level"
+        : '
+        mkdir -p "$root_dir/WRFV4.4/EU_SCORES/$run/$case/Postprocessed/statistics_files/ws_$level"
+        mkdir -p "$root_dir/WRFV4.4/EU_SCORES/$run/$case/Postprocessed/statistics_files/ws_$level/weibull"
         
         # Loop over i and j indices to extract weibull parameters.
         # The catch is the number of processes that can be run in parallel are set to 98.
@@ -47,10 +52,13 @@ for ((case_index=0; case_index<${#cases[@]}; case_index++)); do
         
         # Combine the weibull parameters along all directions and assign XLAT and XLONG coordinates.
         python "$root_dir/scripts/data_processing/Combine_weibull.py" "$run" "$case" "$level" "0" "0" "$south_north" "0"
-        
+
         # Remove the individual weibull files.
-        rm -r "$root_dir/WRFV4.4/EU_SCORES/$run/$case/Postprocessed/variablewise_files/weibull_$level"
+        rm -r "$root_dir/WRFV4.4/EU_SCORES/$run/$case/Postprocessed/statistics_files/ws_$level/weibull"
+        '
+        mv "$root_dir/WRFV4.4/EU_SCORES/$run/$case/Postprocessed/variablewise_files/weibull_$level.nc" "$root_dir/WRFV4.4/EU_SCORES/$run/$case/Postprocessed/statistics_files/ws_$level/weibull.nc"
     done
 done
 wait
+
 echo "Script execution complete."

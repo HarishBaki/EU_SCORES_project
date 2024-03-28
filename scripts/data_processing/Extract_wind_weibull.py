@@ -18,7 +18,7 @@ i = int(sys.argv[4])
 j = int(sys.argv[5])
 
 run_dir=f'{root_dir}/WRFV4.4/EU_SCORES/{run}/{case}/Postprocessed/variablewise_files'
-target_dir=f'{root_dir}/WRFV4.4/EU_SCORES/{run}/{case}/Postprocessed/variablewise_files/weibull_{level}'
+target_dir=f'{root_dir}/WRFV4.4/EU_SCORES/{run}/{case}/Postprocessed/statistics_files/ws_{level}'
 
 chunks={"Time": -1,"south_north": 1,"west_east": 1}
 ws = xr.open_dataset(f'{run_dir}/ws_{level}.nc',chunks=chunks)['ws']
@@ -58,7 +58,7 @@ def calculate_weibull(i,j):
     weibull_dataset['south_north'] = i
     weibull_dataset['west_east'] = j
 
-    weibull_dataset.to_netcdf(f'{target_dir}/{i}_{j}.nc')
+    weibull_dataset.to_netcdf(f'{target_dir}/weibull/{i}_{j}.nc')
     
     #print(f'{i}_{j} done in {time.time()-start} seconds')
 

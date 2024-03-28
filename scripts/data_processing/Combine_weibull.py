@@ -18,18 +18,18 @@ west_east_grids = int(sys.argv[7])
 print(run,case,level,i,j,south_north_grids,west_east_grids)
 
 run_dir=f'{root_dir}/WRFV4.4/EU_SCORES/{run}/{case}/Postprocessed/variablewise_files'
-target_dir=f'{root_dir}/WRFV4.4/EU_SCORES/{run}/{case}/Postprocessed/variablewise_files/weibull_{level}'
+target_dir=f'{root_dir}/WRFV4.4/EU_SCORES/{run}/{case}/Postprocessed/statistics_files/ws_{level}'
 
 if west_east_grids:
     start = time.time()
-    files = [f'{target_dir}/{i}_{j}.nc' for j in range(west_east_grids)]
+    files = [f'{target_dir}/weibull/{i}_{j}.nc' for j in range(west_east_grids)]
     ds = xr.open_mfdataset(files,combine='nested', parallel=True, preprocess=preprocess)
-    ds.to_netcdf(f'{target_dir}/{i}.nc')
+    ds.to_netcdf(f'{target_dir}/weibull/{i}.nc')
     print(f'{i} done in {time.time()-start} seconds')
 
 if south_north_grids:
     start = time.time()
-    files = [f'{target_dir}/{i}.nc' for i in range(south_north_grids)]
+    files = [f'{target_dir}/weibull/{i}.nc' for i in range(south_north_grids)]
     ds = xr.open_mfdataset(files,combine='nested', parallel=True, concat_dim='south_north')
 
     XLAND = xr.open_dataset(f'{run_dir}/XLAND.nc')
@@ -37,6 +37,6 @@ if south_north_grids:
     XLONG = XLAND.XLONG
 
     ds = ds.assign_coords(XLAT=XLAT, XLONG=XLONG)
-    ds.to_netcdf(f'{run_dir}/weibull_{level}.nc')
+    ds.to_netcdf(f'{target_dir}/weibull.nc')
     print(f'{level} done in {time.time()-start} seconds')
 
