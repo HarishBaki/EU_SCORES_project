@@ -16,11 +16,13 @@ if __name__ == '__main__':
     case = sys.argv[2]
     file_name = sys.argv[3]
     variable = sys.argv[4]
+    n_workers = int(sys.argv[5])
+
 
 	# Create a Dask cluster
     print("Starting parallel computing...")
     import dask.distributed as dd
-    cluster = dd.LocalCluster(n_workers=12, dashboard_address=':22722')
+    cluster = dd.LocalCluster(n_workers=n_workers)
     # Connect to the cluster
     client = dd.Client(cluster)
 
@@ -58,5 +60,6 @@ if __name__ == '__main__':
     # === 99th quantile ===#
     print('Calculating 99th quantile statistics')
     quantile_statistics(data,0.99).to_netcdf(f'{target_dir}/quantile_99.nc')
-
-
+    
+    client.close()
+    cluster.close()

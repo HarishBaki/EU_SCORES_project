@@ -2,12 +2,18 @@ import xarray as xr
 import pandas as pd
 import numpy as np
 from scipy.stats import weibull_min
+import time
 
 root_dir = '/media/harish/SSD_4TB/EU_SCORES_project'
 
 def wind_speed(ds1,ds2): 
     ws = xr.DataArray(np.sqrt(ds1**2 + ds2**2), name='ws')
     return ws 
+
+def wind_power_density(ws, rho=1.225):
+    wpd = 0.5 * rho * ws**3
+    wpd = xr.DataArray(wpd.astype('float32'),name='wpd')
+    return wpd
 
 def turbine_power(wind,turbine_type=None):
     # Fix the spline approximation
@@ -54,27 +60,51 @@ def weibull(data):
 
 def mean_statistics(data):
     statistics = xr.Dataset()
+    start = time.time()
     statistics['hourly_values'] = data.groupby('Time.hour').mean(dim='Time').compute()
+    print(f'Hourly statistics calculated in {time.time()-start} seconds')
+    start = time.time()
     statistics['monthly_values'] = data.groupby('Time.month').mean(dim='Time').compute()
+    print(f'Monthly statistics calculated in {time.time()-start} seconds')
+    start = time.time()
     statistics['yearly_values'] = data.groupby('Time.year').mean(dim='Time').compute()
-    statistics['overall_values'] = data.mean(dim='Time').compute()
+    print(f'Yearly statistics calculated in {time.time()-start} seconds')
+    start = time.time()
+    statistics['overall_values'] = statistics['yearly_values'].mean(dim='year').compute()
+    print(f'Overall statistics calculated in {time.time()-start} seconds')
 
     return statistics
 
 def std_statistics(data):
     statistics = xr.Dataset()
+    start = time.time()
     statistics['hourly_values'] = data.groupby('Time.hour').std(dim='Time').compute()
+    print(f'Hourly statistics calculated in {time.time()-start} seconds')
+    start = time.time()
     statistics['monthly_values'] = data.groupby('Time.month').std(dim='Time').compute()
+    print(f'Monthly statistics calculated in {time.time()-start} seconds')
+    start = time.time()
     statistics['yearly_values'] = data.groupby('Time.year').std(dim='Time').compute()
-    statistics['overall_values'] = data.std(dim='Time').compute()
+    print(f'Yearly statistics calculated in {time.time()-start} seconds')
+    start = time.time()
+    statistics['overall_values'] = statistics['yearly_values'].std(dim='year').compute()
+    print(f'Overall statistics calculated in {time.time()-start} seconds')
 
     return statistics
 
 def quantile_statistics(data,quantile):
     statistics = xr.Dataset()
+    start = time.time()
     statistics['hourly_values'] = data.groupby('Time.hour').quantile(quantile,dim='Time',method='inverted_cdf').compute()
+    print(f'Hourly statistics calculated in {time.time()-start} seconds')
+    start = time.time()
     statistics['monthly_values'] = data.groupby('Time.month').quantile(quantile,dim='Time',method='inverted_cdf').compute()
+    print(f'Monthly statistics calculated in {time.time()-start} seconds')
+    start = time.time()
     statistics['yearly_values'] = data.groupby('Time.year').quantile(quantile,dim='Time',method='inverted_cdf').compute()
-    statistics['overall_values'] = data.quantile(quantile,dim='Time',method='inverted_cdf').compute()
+    print(f'Yearly statistics calculated in {time.time()-start} seconds')
+    start = time.time()
+    statistics['overall_values'] = statistics['yearly_values'].quantile(quantile,dim='year',method='inverted_cdf').compute()
+    print(f'Overall statistics calculated in {time.time()-start} seconds')
 
     return statistics
