@@ -50,6 +50,19 @@ def solar_power(ws,swdown,t2,Epv):
     Spv = xr.DataArray(Spv.astype('float32'),name='PVO')
     return Spv
 
+def longitude_convert_0_to_360(lon):
+    return np.where(lon >= 0, lon, lon + 360)
+
+def regional_extraction(ds,target_grid):
+    min_lon = longitude_convert_0_to_360(target_grid['min_lon']-1)
+    max_lon = longitude_convert_0_to_360(target_grid['max_lon']+1)
+    distance_squared = (ds.latitude - (target_grid['min_lat']-1))**2 + (ds.longitude - min_lon)**2
+    indices_ll = np.unravel_index(np.nanargmin(distance_squared), distance_squared.shape)
+    distance_squared = (ds.latitude - (target_grid['max_lat']+1))**2 + (ds.longitude - max_lon)**2
+    indices_uu = np.unravel_index(np.nanargmin(distance_squared), distance_squared.shape)
+    data = ds.sel(y=slice(indices_ll[0],indices_uu[0]),x = slice(indices_ll[1],indices_uu[1]))
+    return data
+
 def weibull(data):
     data = data
     data = np.where(data == 0, np.nan, data)
@@ -58,16 +71,16 @@ def weibull(data):
     shape, _, scale = weibull_min.fit(data, floc=0)
     return shape, scale
 
-def mean_statistics(data):
+def mean_statistics(data,time_coord='Time'):
     statistics = xr.Dataset()
     start = time.time()
-    statistics['hourly_values'] = data.groupby('Time.hour').mean(dim='Time').compute()
+    statistics['hourly_values'] = data.groupby(f'{time_coord}.hour').mean(dim=time_coord).compute()
     print(f'Hourly statistics calculated in {time.time()-start} seconds')
     start = time.time()
-    statistics['monthly_values'] = data.groupby('Time.month').mean(dim='Time').compute()
+    statistics['monthly_values'] = data.groupby(f'{time_coord}.month').mean(dim=time_coord).compute()
     print(f'Monthly statistics calculated in {time.time()-start} seconds')
     start = time.time()
-    statistics['yearly_values'] = data.groupby('Time.year').mean(dim='Time').compute()
+    statistics['yearly_values'] = data.groupby(f'{time_coord}.year').mean(dim=time_coord).compute()
     print(f'Yearly statistics calculated in {time.time()-start} seconds')
     start = time.time()
     statistics['overall_values'] = statistics['yearly_values'].mean(dim='year').compute()
@@ -75,16 +88,16 @@ def mean_statistics(data):
 
     return statistics
 
-def std_statistics(data):
+def std_statistics(data,time_coord='Time'):
     statistics = xr.Dataset()
     start = time.time()
-    statistics['hourly_values'] = data.groupby('Time.hour').std(dim='Time').compute()
+    statistics['hourly_values'] = data.groupby(f'{time_coord}.hour').std(dim=time_coord).compute()
     print(f'Hourly statistics calculated in {time.time()-start} seconds')
     start = time.time()
-    statistics['monthly_values'] = data.groupby('Time.month').std(dim='Time').compute()
+    statistics['monthly_values'] = data.groupby(f'{time_coord}.month').std(dim=time_coord).compute()
     print(f'Monthly statistics calculated in {time.time()-start} seconds')
     start = time.time()
-    statistics['yearly_values'] = data.groupby('Time.year').std(dim='Time').compute()
+    statistics['yearly_values'] = data.groupby(f'{time_coord}.year').std(dim=time_coord).compute()
     print(f'Yearly statistics calculated in {time.time()-start} seconds')
     start = time.time()
     statistics['overall_values'] = statistics['yearly_values'].std(dim='year').compute()
@@ -92,19 +105,62 @@ def std_statistics(data):
 
     return statistics
 
-def quantile_statistics(data,quantile):
+def quantile_statistics(data,quantile,time_coord='Time'):
     statistics = xr.Dataset()
     start = time.time()
-    statistics['hourly_values'] = data.groupby('Time.hour').quantile(quantile,dim='Time',method='inverted_cdf').compute()
+    statistics['hourly_values'] = data.groupby(f'{time_coord}.hour').quantile(quantile,dim=time_coord,method='inverted_cdf').compute()
     print(f'Hourly statistics calculated in {time.time()-start} seconds')
     start = time.time()
-    statistics['monthly_values'] = data.groupby('Time.month').quantile(quantile,dim='Time',method='inverted_cdf').compute()
+    statistics['monthly_values'] = data.groupby(f'{time_coord}.month').quantile(quantile,dim=time_coord,method='inverted_cdf').compute()
     print(f'Monthly statistics calculated in {time.time()-start} seconds')
     start = time.time()
-    statistics['yearly_values'] = data.groupby('Time.year').quantile(quantile,dim='Time',method='inverted_cdf').compute()
+    statistics['yearly_values'] = data.groupby(f'{time_coord}.year').quantile(quantile,dim=time_coord,method='inverted_cdf').compute()
     print(f'Yearly statistics calculated in {time.time()-start} seconds')
     start = time.time()
     statistics['overall_values'] = statistics['yearly_values'].quantile(quantile,dim='year',method='inverted_cdf').compute()
     print(f'Overall statistics calculated in {time.time()-start} seconds')
 
     return statistics
+
+
+def weibull_statistics(ws, i, j, time_coord='Time',south_north='south_north',west_east='west_east'):
+    start = time.time()
+    data = ws[:,i,j].load()
+    hours = np.array(list(data.groupby(f'{time_coord}.hour').groups.keys()))
+    months = np.array(list(data.groupby(f'{time_coord}.month').groups.keys()))
+    years = np.array(list(data.groupby(f'{time_coord}.year').groups.keys()))
+
+    hourly_values = np.zeros((2, len(data.groupby(f'{time_coord}.hour'))))
+    for hour, hourly_data in enumerate(data.groupby(f'{time_coord}.hour')):
+        shape, scale = weibull(hourly_data[1])
+        hourly_values[:, hour] = shape, scale
+    monthly_values = np.zeros((2, len(data.groupby(f'{time_coord}.month'))))
+    for month, monthly_data in enumerate(data.groupby(f'{time_coord}.month')):
+        shape, scale = weibull(monthly_data[1])
+        monthly_values[:, month] = shape, scale
+    yearly_values = np.zeros((2, len(data.groupby(f'{time_coord}.year'))))
+    for year, yearly_data in enumerate(data.groupby(f'{time_coord}.year')):
+        shape, scale = weibull(yearly_data[1])
+        yearly_values[:, year] = shape, scale
+    overall_values = np.zeros((2))
+    shape, scale = weibull(data)
+    overall_values[:] = shape, scale
+    
+    # Create xarray dataset for hourly, monthly, yearly, and overall values
+    weibull_dataset = xr.Dataset({
+        'hourly_values': (('parameter', 'hour'), hourly_values),
+        'monthly_values': (('parameter', 'month'), monthly_values),
+        'yearly_values': (('parameter', 'year'), yearly_values),
+        'overall_values': (('parameter'), overall_values)
+    })
+
+    # Add coordinates
+    weibull_dataset['hour'] = hours
+    weibull_dataset['month'] = months
+    weibull_dataset['year'] = years
+    weibull_dataset['parameter'] = ['shape', 'scale']
+    weibull_dataset[south_north] = i
+    weibull_dataset[west_east] = j
+
+    return weibull_dataset
+

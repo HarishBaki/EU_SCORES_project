@@ -37,12 +37,12 @@ if __name__ == "__main__":
 	# first chunk computation 
     i = 0
     start = time.time()
-    chunk = ws.isel(Time=slice(i, i + chunksize)).compute()
+    chunk = ws.isel(Time=slice(i, i + chunksize))#.compute()
     end = time.time()
     print(f'{i} to {i+chunksize} ws loading takes {end - start}s')
     
     start = time.time()
-    wpd_chunk = wind_power_density(chunk,rho)
+    wpd_chunk = wind_power_density(chunk,rho).compute()
     end = time.time()
     print(f'{i} to {i+chunksize} chunk wpd computation takes {end - start}s')
 	
@@ -51,12 +51,12 @@ if __name__ == "__main__":
 
     for i in range(chunksize, ws.Time.size, chunksize):
         start = time.time()
-        chunk = ws.isel(Time=slice(i, i + chunksize)).compute()
+        chunk = ws.isel(Time=slice(i, i + chunksize))#.compute()
         end = time.time()
         print(f'{i} to {i+chunksize} ws loading takes {end - start}s')
 
         start = time.time()
-        wpd_chunk = wind_power_density(chunk,rho)
+        wpd_chunk = wind_power_density(chunk,rho).compute()
         end = time.time()
         print(f'{i} to {i+chunksize} chunk wpd computation takes {end - start}s')
 

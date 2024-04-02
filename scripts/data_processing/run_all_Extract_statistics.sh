@@ -5,10 +5,10 @@ cases=('Germany_coast' 'Ireland_coast' 'Portugal_coast' 'Netherlands_coast')
 levels=(10 80 100 120 150)
 
 # Loop over cases
-for ((case_index=1; case_index<${#cases[@]}; case_index++)); do
+for ((case_index=3; case_index<${#cases[@]}; case_index++)); do
     case="${cases[$case_index]}"
     mkdir -p "$root_dir/WRFV4.4/EU_SCORES/$run/$case/Postprocessed/statistics_files"
-
+    : '
     # === extracting wind statistics ===#
     
     file_names=('ws_10' 'ws_80' 'ws_100' 'ws_120' 'ws_150')
@@ -35,12 +35,12 @@ for ((case_index=1; case_index<${#cases[@]}; case_index++)); do
         python "$root_dir/scripts/data_processing/Extract_statistics.py" "$run" "$case" "$file_name" "$variable" "12" &
     done
     wait
-
+    '
     # === extracting wind power statistics ===#
-    capacity=('8MW' '15MW')
+    capacity=('15MW')
     file_names=('tp_80' 'tp_100' 'tp_120' 'tp_150')
     variable='power'
-
+    
     # Loop over capacities
     for cap in "${capacity[@]}"; do
         # Loop over file names
