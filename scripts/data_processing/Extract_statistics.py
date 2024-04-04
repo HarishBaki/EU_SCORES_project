@@ -34,6 +34,13 @@ if __name__ == '__main__':
     ds = xr.open_dataset(f'{run_dir}/{file_name}.nc',chunks=chunks)[variable]
     data = ds.isel(Time=slice(None,-1))
 
+    # chech if XLAT and XLONG are present in the dataset, if not, add them to data
+    if 'XLAT' not in ds and 'XLONG' not in ds:
+        XLAND = xr.open_dataset(f'{run_dir}/XLAND.nc')
+        XLAT = XLAND.XLAT
+        XLONG = XLAND.XLONG
+        ds = ds.assign_coords(XLAT=XLAT, XLONG=XLONG)
+
     # === mean ===#
     print('Calculating mean statistics')
     mean_statistics(data).to_netcdf(f'{target_dir}/mean.nc')

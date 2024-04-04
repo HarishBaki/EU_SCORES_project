@@ -6,16 +6,31 @@ import time
 
 root_dir = '/media/harish/SSD_4TB/EU_SCORES_project'
 
-def wind_speed(ds1,ds2): 
+def wind_speed(ds1,ds2):
+    '''
+    ds1: xarray DataArray of u-component of wind
+    ds2: xarray DataArray of v-component of wind
+    returns ws: xarray DataArray of wind speed, magnitude in m/s
+    ''' 
     ws = xr.DataArray(np.sqrt(ds1**2 + ds2**2), name='ws')
     return ws 
 
 def wind_power_density(ws, rho=1.225):
+    '''
+    ws: xarray DataArray of wind speed, magnitude in m/s
+    rho: float, air density in kg/m^3
+    returns wpd: xarray DataArray of wind power density in W/m^2
+    '''
     wpd = 0.5 * rho * ws**3
     wpd = xr.DataArray(wpd.astype('float32'),name='wpd')
     return wpd
 
 def turbine_power(wind,turbine_type=None):
+    '''
+    wind: xarray DataArray of wind speed
+    turbine_type: str, type of turbine, either '15MW' or '8MW'
+    returns power: xarray DataArray of power, in KW
+    '''
     # Fix the spline approximation
     from scipy.interpolate import UnivariateSpline
     if turbine_type == '15MW':
@@ -36,6 +51,13 @@ def turbine_power(wind,turbine_type=None):
 def solar_power(ws,swdown,t2,Epv):
     # Based on Rui Chang et. al., 2022, A coupled WRF-PV mesoscale model simulating the near-surface climate of utility-scale photovoltaic plants
     # Based on https://www.sciencedirect.com/science/article/pii/S0959652623011551#sec2
+    '''
+    ws: xarray DataArray of wind speed, magnitude in m/s
+    swdown: xarray DataArray of downward shortwave radiation in W/m^2
+    t2: xarray DataArray of temperature at 2m in degC
+    Epv: float, efficiency of PV panel
+    returns Spv: xarray DataArray of solar power in W
+    '''
     c1 = 4.3 # degC
     c2 = 0.943 # No units
     c3 = 0.028 # degC.m2.W-1
@@ -51,9 +73,34 @@ def solar_power(ws,swdown,t2,Epv):
     return Spv
 
 def longitude_convert_0_to_360(lon):
+    '''
+    returns longitude in the range of 0 to 360
+    '''
     return np.where(lon >= 0, lon, lon + 360)
 
+def find_nearest_indice(ds_lat,ds_lon,target_lat=None, target_lon=None, lon_convert=None):
+    '''
+    ds_lat: xarray DataArray of latitude
+    ds_lon: xarray DataArray of longitude
+    target_lat: float, target latitude
+    target_lon: float, target longitude
+    lon_convert: bool, whether to convert the target longitude to the same range as the data
+    returns indices: tuple of indices of the nearest grid point
+    '''
+    if lon_convert:
+        # Convert the target longitude to the same range as the data
+        target_lon = longitude_convert_0_to_360(target_lon)
+    distance_squared = (ds_lat - target_lat)**2 + (ds_lon - target_lon)**2
+    indices = np.unravel_index(np.nanargmin(distance_squared), distance_squared.shape)
+    print(f'Closest indices in the order of latitude (y) and longitude (x) are : {indices}')
+    return indices
+
 def regional_extraction(ds,target_grid):
+    '''
+    ds: xarray DataArray
+    target_grid: dict, keys are 'min_lat','max_lat','min_lon','max_lon'
+    returns data: xarray DataArray of the region
+    '''
     min_lon = longitude_convert_0_to_360(target_grid['min_lon']-1)
     max_lon = longitude_convert_0_to_360(target_grid['max_lon']+1)
     distance_squared = (ds.latitude - (target_grid['min_lat']-1))**2 + (ds.longitude - min_lon)**2
@@ -83,7 +130,7 @@ def mean_statistics(data,time_coord='Time'):
     statistics['yearly_values'] = data.groupby(f'{time_coord}.year').mean(dim=time_coord).compute()
     print(f'Yearly statistics calculated in {time.time()-start} seconds')
     start = time.time()
-    statistics['overall_values'] = statistics['yearly_values'].mean(dim='year').compute()
+    statistics['overall_values'] = data.mean(dim=time_coord).compute()
     print(f'Overall statistics calculated in {time.time()-start} seconds')
 
     return statistics
@@ -100,7 +147,7 @@ def std_statistics(data,time_coord='Time'):
     statistics['yearly_values'] = data.groupby(f'{time_coord}.year').std(dim=time_coord).compute()
     print(f'Yearly statistics calculated in {time.time()-start} seconds')
     start = time.time()
-    statistics['overall_values'] = statistics['yearly_values'].std(dim='year').compute()
+    statistics['overall_values'] = data.std(dim=time_coord).compute()
     print(f'Overall statistics calculated in {time.time()-start} seconds')
 
     return statistics
@@ -117,7 +164,7 @@ def quantile_statistics(data,quantile,time_coord='Time'):
     statistics['yearly_values'] = data.groupby(f'{time_coord}.year').quantile(quantile,dim=time_coord,method='inverted_cdf').compute()
     print(f'Yearly statistics calculated in {time.time()-start} seconds')
     start = time.time()
-    statistics['overall_values'] = statistics['yearly_values'].quantile(quantile,dim='year',method='inverted_cdf').compute()
+    statistics['overall_values'] = data.quantile(quantile,dim=time_coord,method='inverted_cdf').compute()
     print(f'Overall statistics calculated in {time.time()-start} seconds')
 
     return statistics
