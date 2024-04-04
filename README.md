@@ -1,2 +1,32 @@
 # EU_SCORES_project
 Consists overall scripts related to the EU_SCORES wind and solar hindcasts.
+# Variable files tree consistend across each location
+
+.
+ * [XLAND.nc](./XLAND.nc)
+ * [TS.csv](./TS.csv)
+ * [UU.csv](./UU.csv)
+ * [VV.csv](./VV.csv)
+ * [ws_10.nc](./ws_10.nc)
+ * [ws_80.nc](./ws_80.nc)
+ * [ws_100.nc](./ws_100.nc)
+ * [ws_120.nc](./ws_120.nc)
+ * [ws_150.nc](./ws_150.nc)
+ * [spv.nc](./spv.nc)
+ * [8MW](./8MW)
+   * [tp_80.nc](./8MW/tp_80.nc)
+   * [tp_100.nc](./8MW/tp_100.nc)
+   * [tp_120.nc](./8MW/tp_120.nc)
+   * [tp_150.nc](./8MW/tp_150.nc)
+ * [15MW](./15MW)
+   * [tp_80.nc](./15MW/tp_80.nc)
+   * [tp_100.nc](./15MW/tp_100.nc)
+   * [tp_120.nc](./15MW/tp_120.nc)
+   * [tp_150.nc](./15MW/tp_150.nc)
+ * [wpd_80.nc](./wpd_80.nc)
+ * [wpd_100.nc](./wpd_100.nc)
+ * [wpd_120.nc](./wpd_120.nc)
+ * [wpd_150.nc](./wpd_150.nc)
+ * [SWDOWN2.nc](./SWDOWN2.nc)
+ * [T2.nc](./T2.nc)
+ * [sample_tree.txt](./sample_tree.txt)
