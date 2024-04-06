@@ -116,3 +116,69 @@ def variability_plotter(fig,gs,data,mean_data,title,xlabel,ylabel,label,color,ma
         ax.set_xticklabels(xlabel_ticks)
     
     return ax
+
+def power_profile_plotter(fig,gs,data,title,xlabel,ylabel,label,color,marker,xlabel_ticks=None,legend=None):
+    ax = fig.add_subplot(gs)
+    #sns.lineplot(x=x, y=y, data=data, ax=ax,lw=2,label=label,legend=legend,color=color,marker=marker,markersize=8)
+    
+    for i, key in enumerate(data):
+        sns.lineplot(x=data.index.name, y=key, data=data, ax=ax, lw=2, label=key, legend=legend, color=colors[i], marker=markers[i], markersize=8)
+    
+    ax.set_title(title,fontsize=14)
+    ax.set_xlabel(xlabel,fontsize=14)
+    ax.set_ylabel(ylabel,fontsize=14)
+    
+    # Set x and y ticks font size
+    ax.tick_params(axis='x', labelsize=14)
+    ax.tick_params(axis='y', labelsize=14)  
+
+    # Set x-axis range
+    ax.set_xlim([data.index.min(), data.index.max()])
+
+    if xlabel_ticks is not None:
+        ax.set_xticks(data.index)
+        ax.set_xticklabels(xlabel_ticks)
+    
+    return ax
+
+def calculate_color_levels(data, threshold=2):
+    """
+    Calculate color levels based on the range of data with different criteria.
+    
+    Parameters:
+        data (array-like): The data array.
+        threshold (float): The threshold to consider when calculating levels.
+        
+    Returns:
+        levels (ndarray): The calculated levels for the color map.
+    """
+    data_min = np.min(data)
+    data_max = np.max(data)
+    data_range = data_max - data_min
+    
+    # Check the data range and set levels accordingly
+    if data_range > 100:
+        # Set levels at 10 multiples, no decimals
+        min_value = np.floor(data_min / 10) * 10
+        max_value = np.ceil(data_max / 10) * 10
+        levels = np.arange(min_value, max_value + 10, 10)
+
+    elif 20 < data_range < 50:
+        # Set levels at multiples of 5, no decimals
+        min_value = np.floor(data_min / 2) * 2
+        max_value = np.ceil(data_max / 2) * 2
+        levels = np.arange(min_value, max_value + 2, 2)
+
+    elif data_range < 20 and data_range > threshold:
+        # Set levels at multiples of 2, no decimals
+        min_value = np.floor(data_min / 1) * 1
+        max_value = np.ceil(data_max / 1) * 1
+        levels = np.arange(min_value, max_value + 1, 1)
+
+    else:
+        # Set levels at multiples of 0.2, up to 2 decimals
+        min_value = np.floor(data_min / 0.2) * 0.2
+        max_value = np.ceil(data_max / 0.2) * 0.2
+        levels = np.arange(min_value, max_value + 0.2, 0.2)
+
+    return levels

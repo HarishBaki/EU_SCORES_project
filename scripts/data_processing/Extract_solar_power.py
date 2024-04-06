@@ -51,7 +51,7 @@ if __name__ == "__main__":
 
 	ws = xr.open_dataset(f'{run_dir}/ws_10.nc',chunks=chunks)['ws']
 	t2m = xr.open_dataset(f'{run_dir}/T2.nc',chunks=chunks)
-	t2m = t2m['T2'].assign_coords(XLAT=XLAT,XLONG=XLONG)-273.16
+	t2m = t2m['T2'].assign_coords(XLAT=XLAT,XLONG=XLONG)
 	swdown = xr.open_dataset(f'{run_dir}/SWDOWN2.nc',chunks=chunks)
 	swdown = swdown['SWDOWN2'].assign_coords(XLAT=XLAT,XLONG=XLONG)
 	

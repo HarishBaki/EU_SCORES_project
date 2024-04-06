@@ -20,7 +20,7 @@ if __name__ == '__main__':
 	# Create a Dask cluster
     print("Starting parallel computing...")
     import dask.distributed as dd
-    cluster = dd.LocalCluster(n_workers=n_workers)
+    cluster = dd.LocalCluster(n_workers=n_workers, threads_per_worker=2, memory_limit='2GB',dashboard_address=':0')
     # Connect to the cluster
     client = dd.Client(cluster)
 
@@ -33,7 +33,7 @@ if __name__ == '__main__':
     ds = xr.open_dataset(f'{run_dir}/{file_name}.nc',chunks=chunks)
     if 'variable' in ds:
         ds = ds.drop('variable')
-    data = ds[variable].isel(time=slice(None,-1),variable=0)
+    data = ds[variable].isel(time=slice(None,-1))
 
     # === mean ===#
     print('Calculating mean statistics')

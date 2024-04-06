@@ -42,12 +42,9 @@ if __name__ == '__main__':
     source_ds = xr.open_dataset(f'{run_dir}/{file_name}.nc',chunks=chunks)[variable]
     data = source_ds.isel(Time=slice(None,-1))
 
-    # chech if XLAT and XLONG are present in the dataset, if not, add them to data
-    if 'XLAT' not in data.coords or 'XLONG' not in data.coords:
-        XLAND = xr.open_dataset(f'{run_dir}/XLAND.nc')
-        XLAT = XLAND.XLAT
-        XLONG = XLAND.XLONG
-        data = data.assign_coords(XLAT=XLAT, XLONG=XLONG)
+    XLAND = xr.open_dataset(f'{run_dir}/XLAND.nc').load()
+    XLAT = XLAND.XLAT
+    XLONG = XLAND.XLONG
 
     # === std ===#
     start = time.time()
@@ -56,6 +53,9 @@ if __name__ == '__main__':
     with xr.open_dataset(f'{target_dir}/{statistic}.nc') as target_ds:
         target_ds['overall_values'] = overall_statistic(data,statistic)
         target_ds = target_ds.load()
+        # chech if XLAT and XLONG are present in the dataset, if not, add them to data
+        if 'XLAT' not in target_ds.coords or 'XLONG' not in target_ds.coords:
+            target_ds = target_ds.assign_coords(XLAT=XLAT, XLONG=XLONG)
     # save the ds to the same file
     target_ds.to_netcdf(f'{target_dir}/{statistic}.nc',mode='w')
     print(f'Time taken for std calculation: {time.time()-start}')
@@ -70,6 +70,9 @@ if __name__ == '__main__':
     with xr.open_dataset(f'{target_dir}/{statistic}.nc') as target_ds:
         target_ds['overall_values'] = cov['overall_values']
         target_ds = target_ds.load()
+        # chech if XLAT and XLONG are present in the dataset, if not, add them to data
+        if 'XLAT' not in target_ds.coords or 'XLONG' not in target_ds.coords:
+            target_ds = target_ds.assign_coords(XLAT=XLAT, XLONG=XLONG)
     # save the ds to the same file
     target_ds.to_netcdf(f'{target_dir}/{statistic}.nc',mode='w')
     print(f'Time taken for CoV calculation: {time.time()-start}')
@@ -83,6 +86,9 @@ if __name__ == '__main__':
     with xr.open_dataset(f'{target_dir}/{statistic}_5.nc') as target_ds:
         target_ds['overall_values'] = overall_statistic(data,statistic,time_coord='Time',quantile=quantile)
         target_ds = target_ds.load()
+        # chech if XLAT and XLONG are present in the dataset, if not, add them to data
+        if 'XLAT' not in target_ds.coords or 'XLONG' not in target_ds.coords:
+            target_ds = target_ds.assign_coords(XLAT=XLAT, XLONG=XLONG)
     # save the ds to the same file
     target_ds.to_netcdf(f'{target_dir}/{statistic}_5.nc',mode='w')
     print(f'Time taken for 5th quantile calculation: {time.time()-start}')
@@ -95,6 +101,9 @@ if __name__ == '__main__':
     with xr.open_dataset(f'{target_dir}/{statistic}_95.nc') as target_ds:
         target_ds['overall_values'] = overall_statistic(data,statistic,time_coord='Time',quantile=quantile)
         target_ds = target_ds.load()
+        # chech if XLAT and XLONG are present in the dataset, if not, add them to data
+        if 'XLAT' not in target_ds.coords or 'XLONG' not in target_ds.coords:
+            target_ds = target_ds.assign_coords(XLAT=XLAT, XLONG=XLONG)
     # save the ds to the same file
     target_ds.to_netcdf(f'{target_dir}/{statistic}_95.nc',mode='w')
     print(f'Time taken for 95th quantile calculation: {time.time()-start}')
@@ -107,6 +116,9 @@ if __name__ == '__main__':
     with xr.open_dataset(f'{target_dir}/{statistic}_99.nc') as target_ds:
         target_ds['overall_values'] = overall_statistic(data,statistic,time_coord='Time',quantile=quantile)
         target_ds = target_ds.load()
+        # chech if XLAT and XLONG are present in the dataset, if not, add them to data
+        if 'XLAT' not in target_ds.coords or 'XLONG' not in target_ds.coords:
+            target_ds = target_ds.assign_coords(XLAT=XLAT, XLONG=XLONG)
     # save the ds to the same file
     target_ds.to_netcdf(f'{target_dir}/{statistic}_99.nc',mode='w')
     print(f'Time taken for 99th quantile calculation: {time.time()-start}')

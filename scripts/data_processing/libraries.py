@@ -56,7 +56,7 @@ def solar_power(ws,swdown,t2,Epv):
     swdown: xarray DataArray of downward shortwave radiation in W/m^2
     t2: xarray DataArray of temperature at 2m in degC
     Epv: float, efficiency of PV panel
-    returns Spv: xarray DataArray of solar power in W
+    returns Spv: xarray DataArray of solar power in W/m^2
     '''
     c1 = 4.3 # degC
     c2 = 0.943 # No units

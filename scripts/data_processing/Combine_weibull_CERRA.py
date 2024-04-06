@@ -17,7 +17,7 @@ west_east_grids = int(sys.argv[6])
 print(region,level,i,j,south_north_grids,west_east_grids)
 
 run_dir = f'{root_dir}/CERRA'
-target_dir=f'{run_dir}/{region}/statistics_files/ws{level}'
+target_dir=f'{run_dir}/{region}/statistics_files/ws_{level}'
 
 if west_east_grids:
     start = time.time()

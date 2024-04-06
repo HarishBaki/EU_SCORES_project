@@ -20,11 +20,11 @@ if __name__ == '__main__':
     start = time.time()
     run_dir = f'{root_dir}/CERRA'
     chunks={"time": -1,"x": 1,"y": 1}
-    ds = xr.open_dataset(f'{run_dir}/{region}/variablewise_files/ws{level}.nc',chunks=chunks)
-    ws = ds['ws'].isel(variable=0,time=slice(None,-1)).drop('variable')
+    ds = xr.open_dataset(f'{run_dir}/{region}/variablewise_files/ws_{level}.nc',chunks=chunks)
+    ws = ds['ws'].isel(variable=0,time=slice(None,-1))
 
     # make dir if doesnt exist
-    target_dir = f'{run_dir}/{region}/statistics_files/ws{level}'
+    target_dir = f'{run_dir}/{region}/statistics_files/ws_{level}'
     os.makedirs(f'{target_dir}/weibull', exist_ok=True)
 
     # remove if file exist
