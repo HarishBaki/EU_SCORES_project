@@ -29,6 +29,10 @@ all_sample_points['Ireland_coast'] = {
     "P3": (52.9, -10.4),
 }
 
+CERRA_target_grids = {'Iberia': {'min_lat': 41.25, 'min_lon': -9.35,'max_lat':41.8,'max_lon':-8.65},
+           'Ireland': {'min_lat': 52.49, 'min_lon': -10.51,'max_lat':53,'max_lon':-9.7},
+           'BeNeLux': {'min_lat': 50.95, 'min_lon': 2.25,'max_lat':51.8,'max_lon':3.55}}
+
 colors = [
     'black',  # Light Blue
     'orange',    # Dark Orange
