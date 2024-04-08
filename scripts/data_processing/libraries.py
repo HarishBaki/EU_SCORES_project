@@ -100,6 +100,7 @@ def regional_extraction(ds,target_grid):
     ds: xarray DataArray
     target_grid: dict, keys are 'min_lat','max_lat','min_lon','max_lon'
     returns data: xarray DataArray of the region
+    Extracts CERRA subsets based on the target grid
     '''
     min_lon = longitude_convert_0_to_360(target_grid['min_lon']-1)
     max_lon = longitude_convert_0_to_360(target_grid['max_lon']+1)

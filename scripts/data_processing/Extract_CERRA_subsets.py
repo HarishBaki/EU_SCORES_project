@@ -27,13 +27,18 @@ if __name__ == '__main__':
 
     # Load the CERRA data
     run_dir = f'{root_dir}/CERRA'
+
     files = sorted(glob.glob(f'{run_dir}/{var_dir}/CERRA_*.nc'))
     chunks={"time": 96,"x": -1,"y": -1}
     ds = xr.open_mfdataset(files,chunks=chunks,concat_dim='time',combine='nested',parallel=True)
     data = ds.sel(time=slice('1990-01-01T00','2021-01-01T00'))
 
+    # land-sea-mask data
+    lsm_file = f'{run_dir}/CERRA_landseamask.nc'
+    lsm_ds = xr.open_dataset(lsm_file)['lsm']
+
     # target grids
-    target_grids = {'Portugal': {'min_lat': 41.25, 'min_lon': -9.35,'max_lat':41.8,'max_lon':-8.65},
+    target_grids = {'Iberia': {'min_lat': 41.25, 'min_lon': -9.35,'max_lat':41.8,'max_lon':-8.65},
             'Ireland': {'min_lat': 52.49, 'min_lon': -10.51,'max_lat':53,'max_lon':-9.7},
             'BeNeLux': {'min_lat': 50.95, 'min_lon': 2.25,'max_lat':51.8,'max_lon':3.55}}
     
@@ -44,6 +49,8 @@ if __name__ == '__main__':
             os.makedirs(f'{run_dir}/{region}/variablewise_files')
         
         target_grid = target_grids[region]
+
+        # === extracting regional data ===
         data_region = regional_extraction(data,target_grid)
         data_region = xr.DataArray(data_region.to_array().astype('float32'),name=variable)
         # target file 
@@ -52,6 +59,15 @@ if __name__ == '__main__':
             os.remove(target_file)
         data_region.to_netcdf(target_file)
         print(f'{variable} for {region} is extracted and saved')
+
+        # === extracting land-sea-mask data ===
+        lsm_region = regional_extraction(lsm_ds,target_grid)
+        # target file
+        target_file = f'{run_dir}/{region}/variablewise_files/lsm.nc'
+        if os.path.exists(target_file):
+            os.remove(target_file)
+        lsm_region.to_netcdf(target_file)  
+        print(f'Land-sea-mask for {region} is extracted and saved')
 
     # Close the cluster
     #client.close()

@@ -163,26 +163,37 @@ def calculate_color_levels(data, threshold=2):
     # Check the data range and set levels accordingly
     if data_range > 100:
         # Set levels at 10 multiples, no decimals
-        min_value = np.floor(data_min / 10) * 10
-        max_value = np.ceil(data_max / 10) * 10
-        levels = np.arange(min_value, max_value + 10, 10)
+        num = 10
+        min_value = np.floor(data_min / num) * num
+        max_value = np.ceil(data_max / num) * num
+        levels = np.arange(min_value, max_value + num, num)
 
-    elif 20 < data_range < 50:
+    elif 20 < data_range < 100:
         # Set levels at multiples of 5, no decimals
-        min_value = np.floor(data_min / 2) * 2
-        max_value = np.ceil(data_max / 2) * 2
-        levels = np.arange(min_value, max_value + 2, 2)
+        num = 5
+        min_value = np.floor(data_min / num) * num
+        max_value = np.ceil(data_max / num) * num
+        levels = np.arange(min_value, max_value + num, num)
 
-    elif data_range < 20 and data_range > threshold:
-        # Set levels at multiples of 2, no decimals
-        min_value = np.floor(data_min / 1) * 1
-        max_value = np.ceil(data_max / 1) * 1
-        levels = np.arange(min_value, max_value + 1, 1)
+    elif 10 < data_range < 20:
+        # Set levels at multiples of 1, no decimals
+        num = 1
+        min_value = np.floor(data_min / num) * num
+        max_value = np.ceil(data_max / num) * num
+        levels = np.arange(min_value, max_value + num, num)
+    
+    elif threshold < data_range < 10:
+        # Set levels at multiples of 1, no decimals
+        num = 0.5
+        min_value = np.floor(data_min / num) * num
+        max_value = np.ceil(data_max / num) * num
+        levels = np.arange(min_value, max_value + num, num)
 
     else:
-        # Set levels at multiples of 0.2, up to 2 decimals
-        min_value = np.floor(data_min / 0.2) * 0.2
-        max_value = np.ceil(data_max / 0.2) * 0.2
-        levels = np.arange(min_value, max_value + 0.2, 0.2)
+        # Set levels at multiples of 0.1, up to 2 decimals
+        num = 0.1
+        min_value = np.floor(data_min / num) * num
+        max_value = np.ceil(data_max / num) * num
+        levels = np.arange(min_value, max_value + num, num)
 
     return levels

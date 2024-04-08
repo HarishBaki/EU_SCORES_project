@@ -1,7 +1,7 @@
 #conda activate wrf-python-stable
 root_dir='/media/harish/SSD_4TB/EU_SCORES_project'
-: '
-var_dirs=('ws10' 'ws100' 't2m' 'swdown')
+
+var_dirs=('ws_10' 'ws_100' 't2m' 'swdown')
 var_names=('ws' 'ws' 't2m' 'ssrd')
 
 for index in "${!var_dirs[@]}"; do
@@ -12,9 +12,7 @@ for index in "${!var_dirs[@]}"; do
 done
 wait
 echo "Script execution complete."
-'
 
-: '
 # Curate CERRA subsets, as follows.
 # 1. Remove variable coordinate and dimension from all data
 # 2. Convert T2M from K to C
@@ -27,7 +25,6 @@ for index in "${!regions[@]}"; do
 done
 wait
 echo "Script execution complete."
-'
 
 # extracting wind power density
 regions=('Iberia' 'Ireland' 'BeNeLux')
@@ -61,5 +58,6 @@ for index in "${!regions[@]}"; do
     echo "Processing $region"
     python $root_dir/scripts/data_processing/Extract_CERRA_solar_power.py "$region" &
 done
+
 wait
 echo "Script execution complete."
