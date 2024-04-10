@@ -119,6 +119,25 @@ def weibull(data):
     shape, _, scale = weibull_min.fit(data, floc=0)
     return shape, scale
 
+def compute_statistics(data, statistic, time_scale=None, **kwargs):
+    '''
+    data: xarray DataArray
+    statistic: str, statistic to be calculated
+    time_scale: str, time scale for which the statistic is to be calculated, either 'hour', 'month', 'season', 'year', or 'overall'
+    kwargs: additional arguments for the statistic, e.g., dim='Time', quantile=0.05
+    returns statistics: xarray DataArray of the calculated statistic
+    '''
+    start = time.time()
+    dim = kwargs.get('dim', 'Time')
+    if time_scale == 'overall':
+        statistics = getattr(data, statistic)(**kwargs).compute()
+        print(f'Overall {statistic} calculated in {time.time()-start} seconds')
+    else:
+        statistics = getattr(data.groupby(f'{dim}.{time_scale}'), statistic)(**kwargs).compute()
+        print(f'{time_scale} {statistic} calculated in {time.time()-start} seconds')
+        
+    return statistics
+
 def mean_statistics(data,time_coord='Time'):
     statistics = xr.Dataset()
     start = time.time()
@@ -127,6 +146,9 @@ def mean_statistics(data,time_coord='Time'):
     start = time.time()
     statistics['monthly_values'] = data.groupby(f'{time_coord}.month').mean(dim=time_coord).compute()
     print(f'Monthly statistics calculated in {time.time()-start} seconds')
+    start = time.time()
+    statistics['seasonal_values'] = data.groupby(f'{time_coord}.season').mean(dim=time_coord).compute()
+    print(f'Seasonal statistics calculated in {time.time()-start} seconds')
     start = time.time()
     statistics['yearly_values'] = data.groupby(f'{time_coord}.year').mean(dim=time_coord).compute()
     print(f'Yearly statistics calculated in {time.time()-start} seconds')
@@ -145,6 +167,9 @@ def std_statistics(data,time_coord='Time'):
     statistics['monthly_values'] = data.groupby(f'{time_coord}.month').std(dim=time_coord).compute()
     print(f'Monthly statistics calculated in {time.time()-start} seconds')
     start = time.time()
+    statistics['seasonal_values'] = data.groupby(f'{time_coord}.season').std(dim=time_coord).compute()
+    print(f'Seasonal statistics calculated in {time.time()-start} seconds')
+    start = time.time()
     statistics['yearly_values'] = data.groupby(f'{time_coord}.year').std(dim=time_coord).compute()
     print(f'Yearly statistics calculated in {time.time()-start} seconds')
     start = time.time()
@@ -162,6 +187,9 @@ def quantile_statistics(data,quantile,time_coord='Time'):
     statistics['monthly_values'] = data.groupby(f'{time_coord}.month').quantile(quantile,dim=time_coord,method='inverted_cdf').compute()
     print(f'Monthly statistics calculated in {time.time()-start} seconds')
     start = time.time()
+    statistics['seasonal_values'] = data.groupby(f'{time_coord}.season').quantile(quantile,dim=time_coord,method='inverted_cdf').compute()
+    print(f'Seasonal statistics calculated in {time.time()-start} seconds')
+    start = time.time()
     statistics['yearly_values'] = data.groupby(f'{time_coord}.year').quantile(quantile,dim=time_coord,method='inverted_cdf').compute()
     print(f'Yearly statistics calculated in {time.time()-start} seconds')
     start = time.time()
@@ -176,6 +204,7 @@ def weibull_statistics(ws, i, j, time_coord='Time',south_north='south_north',wes
     data = ws[:,i,j].load()
     hours = np.array(list(data.groupby(f'{time_coord}.hour').groups.keys()))
     months = np.array(list(data.groupby(f'{time_coord}.month').groups.keys()))
+    seasons = np.array(list(data.groupby(f'{time_coord}.season').groups.keys()))
     years = np.array(list(data.groupby(f'{time_coord}.year').groups.keys()))
 
     hourly_values = np.zeros((2, len(data.groupby(f'{time_coord}.hour'))))
@@ -186,6 +215,10 @@ def weibull_statistics(ws, i, j, time_coord='Time',south_north='south_north',wes
     for month, monthly_data in enumerate(data.groupby(f'{time_coord}.month')):
         shape, scale = weibull(monthly_data[1])
         monthly_values[:, month] = shape, scale
+    seasonal_values = np.zeros((2, len(data.groupby(f'{time_coord}.season'))))
+    for season, seasonal_data in enumerate(data.groupby(f'{time_coord}.season')):
+        shape, scale = weibull(seasonal_data[1])
+        seasonal_values[:, season] = shape, scale
     yearly_values = np.zeros((2, len(data.groupby(f'{time_coord}.year'))))
     for year, yearly_data in enumerate(data.groupby(f'{time_coord}.year')):
         shape, scale = weibull(yearly_data[1])
@@ -198,6 +231,7 @@ def weibull_statistics(ws, i, j, time_coord='Time',south_north='south_north',wes
     weibull_dataset = xr.Dataset({
         'hourly_values': (('parameter', 'hour'), hourly_values),
         'monthly_values': (('parameter', 'month'), monthly_values),
+        'seasonal_values': (('parameter', 'season'), seasonal_values),
         'yearly_values': (('parameter', 'year'), yearly_values),
         'overall_values': (('parameter'), overall_values)
     })
@@ -205,6 +239,7 @@ def weibull_statistics(ws, i, j, time_coord='Time',south_north='south_north',wes
     # Add coordinates
     weibull_dataset['hour'] = hours
     weibull_dataset['month'] = months
+    weibull_dataset['season'] = seasons
     weibull_dataset['year'] = years
     weibull_dataset['parameter'] = ['shape', 'scale']
     weibull_dataset[south_north] = i
