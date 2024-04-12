@@ -162,6 +162,11 @@ cython_debug/
 # ignore slurm output files
 *.out
 
-WRFV4.4/EU_SCORES/
+WRFV4.4/EU_SCORES/eval/
+WRFV4.4/EU_SCORES/Validation_runs/
+WRFV4.4/EU_SCORES/New_runs/Germany_coast/Postprocessed/
+WRFV4.4/EU_SCORES/New_runs/Ireland_coast/Postprocessed/
+WRFV4.4/EU_SCORES/New_runs/Portugal_coast/Postprocessed/
+WRFV4.4/EU_SCORES/New_runs/Netherlands_coast/Postprocessed/
 Reports/
 CERRA/
