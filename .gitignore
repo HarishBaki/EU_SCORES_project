@@ -162,6 +162,10 @@ cython_debug/
 # ignore slurm output files
 *.out
 
+# ignore .WPS folders
+.WPS_*/
+WPS/
+
 WRFV4.4/EU_SCORES/eval/
 WRFV4.4/EU_SCORES/Validation_runs/
 WRFV4.4/EU_SCORES/New_runs/Germany_coast/Postprocessed/
