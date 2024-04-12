@@ -128,7 +128,7 @@ def compute_statistics(data, statistic, time_scale=None, **kwargs):
     returns statistics: xarray DataArray of the calculated statistic
     '''
     start = time.time()
-    dim = kwargs.get('dim', 'Time')
+    dim = kwargs.get('dim', 'Time') # takes dim from dim kwargs, or Default dimension is 'Time'
     if time_scale == 'overall':
         statistics = getattr(data, statistic)(**kwargs).compute()
         print(f'Overall {statistic} calculated in {time.time()-start} seconds')
@@ -199,49 +199,41 @@ def quantile_statistics(data,quantile,time_coord='Time'):
     return statistics
 
 
-def weibull_statistics(ws, i, j, time_coord='Time',south_north='south_north',west_east='west_east'):
+def weibull_statistics(ws, i, j,time_scale, time_coord='Time',south_north='south_north',west_east='west_east'):
+    '''
+    ws: xarray DataArray of wind speed
+    i: int, latitude index
+    j: int, longitude index
+    time_scale: str, time scale for which the Weibull statistics are to be calculated, either 'hour', 'month', 'year', or 'overall'
+    time_coord: str, time coordinate in the data
+    south_north: str, latitude coordinate in the data
+    west_east: str, longitude coordinate in the data
+    returns weibull_dataset: xarray Dataset of Weibull statistics
+    '''
     start = time.time()
-    data = ws[:,i,j].load()
-    hours = np.array(list(data.groupby(f'{time_coord}.hour').groups.keys()))
-    months = np.array(list(data.groupby(f'{time_coord}.month').groups.keys()))
-    seasons = np.array(list(data.groupby(f'{time_coord}.season').groups.keys()))
-    years = np.array(list(data.groupby(f'{time_coord}.year').groups.keys()))
-
-    hourly_values = np.zeros((2, len(data.groupby(f'{time_coord}.hour'))))
-    for hour, hourly_data in enumerate(data.groupby(f'{time_coord}.hour')):
-        shape, scale = weibull(hourly_data[1])
-        hourly_values[:, hour] = shape, scale
-    monthly_values = np.zeros((2, len(data.groupby(f'{time_coord}.month'))))
-    for month, monthly_data in enumerate(data.groupby(f'{time_coord}.month')):
-        shape, scale = weibull(monthly_data[1])
-        monthly_values[:, month] = shape, scale
-    seasonal_values = np.zeros((2, len(data.groupby(f'{time_coord}.season'))))
-    for season, seasonal_data in enumerate(data.groupby(f'{time_coord}.season')):
-        shape, scale = weibull(seasonal_data[1])
-        seasonal_values[:, season] = shape, scale
-    yearly_values = np.zeros((2, len(data.groupby(f'{time_coord}.year'))))
-    for year, yearly_data in enumerate(data.groupby(f'{time_coord}.year')):
-        shape, scale = weibull(yearly_data[1])
-        yearly_values[:, year] = shape, scale
-    overall_values = np.zeros((2))
-    shape, scale = weibull(data)
-    overall_values[:] = shape, scale
+    data = ws.isel({south_north: i, west_east: j}).load()
+    if time_scale == 'overall':
+        weibull_ds = np.zeros((2))
+        shape, scale = weibull(data)
+        weibull_ds[:] = shape, scale
+        # Create xarray dataset for hourly, monthly, yearly, and overall values
+        weibull_dataset = xr.Dataset({
+            f'{time_scale}_values': (('parameter'), weibull_ds)
+        })
+    else:
+        time_scale_values = np.array(list(data.groupby(f'{time_coord}.{time_scale}').groups.keys()))
+        weibull_ds = np.zeros((2, len(time_scale_values)))
+        for indice, sub_data in enumerate(data.groupby(f'{time_coord}.{time_scale}')):
+            shape, scale = weibull(sub_data[1])
+            weibull_ds[:, indice] = shape, scale
+        # Create xarray dataset for hourly, monthly, yearly, and overall values
+        weibull_dataset = xr.Dataset({
+            f'{time_scale}_values': (('parameter', time_scale), weibull_ds)})
+        # Add coordinates
+        weibull_dataset[f'{time_scale}'] = time_scale_values
+    end = time.time()
+    print(f'Elapsed time: {end - start}')
     
-    # Create xarray dataset for hourly, monthly, yearly, and overall values
-    weibull_dataset = xr.Dataset({
-        'hourly_values': (('parameter', 'hour'), hourly_values),
-        'monthly_values': (('parameter', 'month'), monthly_values),
-        'seasonal_values': (('parameter', 'season'), seasonal_values),
-        'yearly_values': (('parameter', 'year'), yearly_values),
-        'overall_values': (('parameter'), overall_values)
-    })
-
-    # Add coordinates
-    weibull_dataset['hour'] = hours
-    weibull_dataset['month'] = months
-    weibull_dataset['season'] = seasons
-    weibull_dataset['year'] = years
-    weibull_dataset['parameter'] = ['shape', 'scale']
     weibull_dataset[south_north] = i
     weibull_dataset[west_east] = j
 

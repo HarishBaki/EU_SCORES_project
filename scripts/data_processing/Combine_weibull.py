@@ -14,6 +14,7 @@ i = int(sys.argv[4])
 j = int(sys.argv[5])
 south_north_grids = int(sys.argv[6])
 west_east_grids = int(sys.argv[7])
+time_scale = sys.argv[8]
 
 print(run,case,level,i,j,south_north_grids,west_east_grids)
 
@@ -37,6 +38,16 @@ if south_north_grids:
     XLONG = XLAND.XLONG
 
     ds = ds.assign_coords(XLAT=XLAT, XLONG=XLONG)
-    ds.to_netcdf(f'{target_dir}/weibull.nc')
+
+    # Now, instead of saving individual time scale files, append the data one by one to the total weibull file
+    target_file = f'{target_dir}/weibull.nc'
+    if os.path.exists(target_file):
+        with xr.open_dataset(target_file) as target_ds:
+            target_ds = target_ds.load()
+    else:
+        None
+        target_ds = xr.Dataset()
+
+    ds.combine_first(target_ds).to_netcdf(target_file)
     print(f'{level} done in {time.time()-start} seconds')
 
