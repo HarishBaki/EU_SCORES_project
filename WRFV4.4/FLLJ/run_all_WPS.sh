@@ -3,7 +3,7 @@ WPS_source_dir=/media/sukanta/HD2/WRF/WRFV4.4/WPS # this is the WPS installation
 root_dir='/media/harish/SSD_4TB/EU_SCORES_project/WRFV4.4/FLLJ'
 start_dates=('2016-02-21_12:00:00' '2016-03-03_12:00:00')
 end_dates=('2016-02-22_18:00:00' '2016-03-04_18:00:00')
-cases=('FLLJ_1' 'FLLJ_2')
+cases=('FLLJ_1') #'FLLJ_2')
 for (( i=0; i<${#cases[@]}; i++ ));
 do
     case=${cases[$i]}

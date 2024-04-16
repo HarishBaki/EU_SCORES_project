@@ -21,14 +21,22 @@ do
             day=$(date -ud "$current_date" +"%d")
             hour=$(date -ud "$current_date" +"%H")
             cdsapirc_file=${cdsapirc_files[counter]}
-            if [ $((10#$hour % 3)) -ne 0 ]; then  # Exclude hours divisible by 3
-                echo $cdsapirc_file $year $month $day $hour
-                python $root_dir/CERRA_convert_ERA5.py $cdsapirc_file $year $month $day $hour &
-                counter=$(( (counter + 1) % num_cdsapirc ))  # Increment counter cyclically
-                if [ $counter -eq 0 ]; then
-                    wait  # Wait for every 6 concurrent runs
-                fi
-            fi
+            
+            # check if files already exist in the directory. This is needed, because, some times, CERRA downloads fail.
+            if ls "CERRA_"$year"_"$month"_"$day"-"$hour"_PRES.grb" \
+				&& ls "CERRA_"$year"_"$month"_"$day"-"$hour"_SFC.grb" \
+				&& ls "ERA5_"$year"_"$month"_"$day"-"$hour"_soil.grb" 1>/dev/null 2>&1;
+			then
+				x_files=($(ls "CERRA_"$year"_"$month"_"$day"-"$hour"_PRES.grb" "CERRA_"$year"_"$month"_"$day"-"$hour"_SFC.grb" "ERA5_"$year"_"$month"_"$day"-"$hour"_soil.grb"))
+				#echo "All files exist:"$(ls -l ${x_files[*]})
+			else
+		        echo $cdsapirc_file $year $month $day $hour
+		        python $root_dir/CERRA_convert_ERA5.py $cdsapirc_file $year $month $day $hour &
+		        counter=$(( (counter + 1) % num_cdsapirc ))  # Increment counter cyclically
+		        if [ $counter -eq 0 ]; then
+		            wait  # Wait for every 6 concurrent runs
+		        fi
+	        fi
             current_date=$(date -ud "$current_date + 1 hour" +"%Y-%m-%d %H")
         done
     cd $root_dir
