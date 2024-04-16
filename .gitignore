@@ -165,6 +165,10 @@ cython_debug/
 # ignore .WPS folders
 .WPS_*/
 WPS/
+WPS_*/
+geo_em.*
+Input_DATA*/
+WRF_*/
 
 WRFV4.4/EU_SCORES/eval/
 WRFV4.4/EU_SCORES/Validation_runs/

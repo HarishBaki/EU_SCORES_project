@@ -1,0 +1,50 @@
+&share
+ wrf_core = 'ARW',
+ max_dom = 3,
+ start_date =
+ end_date =
+ interval_seconds = 10800
+ io_form_geogrid = 2,
+/
+
+&geogrid
+ parent_id         =   1,   1,2,
+ parent_grid_ratio =   1,   3,3,
+ i_parent_start    =   1,  80,40,
+ j_parent_start    =   1,  65,40,
+ e_we              =  211, 244,301,
+ e_sn              =  187, 244,301,
+ !
+ !!!!!!!!!!!!!!!!!!!!!!!!!!!! IMPORTANT NOTE !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ ! The default datasets used to produce the MAXSNOALB and ALBEDO12M
+ ! fields have changed in WPS v4.0. These fields are now interpolated
+ ! from MODIS-based datasets.
+ !
+ ! To match the output given by the default namelist.wps in WPS v3.9.1,
+ ! the following setting for geog_data_res may be used:
+ !
+ ! geog_data_res = 'maxsnowalb_ncep+albedo_ncep+default', 'maxsnowalb_ncep+albedo_ncep+default', 
+ !
+ !!!!!!!!!!!!!!!!!!!!!!!!!!!! IMPORTANT NOTE !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ !
+ geog_data_res = 'default','default','default'
+ dx = 9000,
+ dy = 9000,
+ map_proj = 'lambert',
+ ref_lat   =  51.6,
+ ref_lon   =  2.9,
+ truelat1  =  30.0,
+ truelat2  =  60.0,
+ stand_lon =  2.9,
+ geog_data_path = '/home/sukanta/WRF/DATA/geogV4'
+/
+
+&ungrib
+ out_format = 'WPS',
+ prefix = 'GFS',
+/
+
+&metgrid
+ fg_name = 'GFS'
+ io_form_metgrid = 2, 
+/

@@ -22,7 +22,21 @@ import sys
 year = sys.argv[2]
 month = sys.argv[3]
 day = sys.argv[4]
-time = sys.argv[5]
+time = sys.argv[5] # convert time into two digit format
+
+
+# if time is divisible by 3, then product_type = "analysis", else product_type = "forecast
+if int(time)%3 == 0:
+    product_type = "analysis"
+    hour = int(time)
+else:
+    product_type = "forecast"
+    # convert time into nearest multiple of 3
+    leadtime_hour = int(time)%3
+    hour = str(int(int(time)/3)*3)
+
+print(year,month,day,time,product_type,leadtime_hour)
+
 #--- Change values of year, month, day, and time only ---#
 
 # Import cdsapi and create a Client instance
@@ -37,7 +51,7 @@ c = cdsapi.Client(url=credentials['url'], key=credentials['key'])
 
 c.retrieve("reanalysis-cerra-pressure-levels", {
         "data_type": "reanalysis",
-        "product_type": "analysis",
+        "product_type": product_type,
         "variable":       ["u","v","z","t","r"],
         "pressure_level": ["1","2","3","5","7","10","20","30","50","70","100",
                            "125","150","175","200","225","250","300","350","400",
@@ -46,14 +60,16 @@ c.retrieve("reanalysis-cerra-pressure-levels", {
         "year":           year,
         "month":          month,
         "day":            day,
-        "time":           time,
+        "time":           hour,
+        # if product_type == "forecast", then add leadtime_hour
+        **({"leadtime_hour": leadtime_hour} if product_type == "forecast" else {}),
         "format":          "grib",
     }, "CERRA_"+year+"_"+month+"_"+day+"-"+time+"_PRES.grb")
 print("CERRA_"+year+"_"+month+"_"+day+"-"+time+"_PRES.grb")
 
 c.retrieve("reanalysis-cerra-single-levels", {
         "data_type": "reanalysis",
-        "product_type": "analysis",
+        "product_type": product_type,
         "level_type": "surface_or_atmosphere",
         'variable': [
         '10m_wind_direction', '10m_wind_speed', '2m_relative_humidity',
@@ -66,7 +82,9 @@ c.retrieve("reanalysis-cerra-single-levels", {
         "year":           year,
         "month":          month,
         "day":            day,
-        "time":           time,
+        "time":           hour,
+        # if product_type == "forecast", then add leadtime_hour
+        **({"leadtime_hour": leadtime_hour} if product_type == "forecast" else {}),
         "format":          "grib",
     }, "CERRA_"+year+"_"+month+"_"+day+"-"+time+"_SFC.grb")
 print("CERRA_"+year+"_"+month+"_"+day+"-"+time+"_SFC.grb")
@@ -108,6 +126,3 @@ c.retrieve("reanalysis-era5-single-levels", {
     "time":           time,
 }, "ERA5_"+year+"_"+month+"_"+day+"-"+time+"_soil.grb")
 print("ERA5_"+year+"_"+month+"_"+day+"-"+time+"_soil.grb")
-
-
-

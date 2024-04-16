@@ -1,0 +1,3 @@
+# Filters the following patterns
++ met_em.d0*
+- *

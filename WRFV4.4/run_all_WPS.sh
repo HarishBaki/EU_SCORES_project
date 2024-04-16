@@ -15,7 +15,7 @@ end_date="1989-12-31"
 # Another loop runs WPS at every 3 hours, starting from 00 hours to 21 hours.
 
 root_dir='/media/harish/SSD_4TB/EU_SCORES_project'
-case='Ireland_coast'    # cases are the names of regions we are simulating, e.g. 'Germany_coast' 'Portugal_coast' 'Ireland_coast' 'Netherlands_coast'
+case='Portugal_coast'    # cases are the names of regions we are simulating, e.g. 'Germany_coast' 'Portugal_coast' 'Ireland_coast' 'Netherlands_coast'
 case_dir="$root_dir/WRFV4.4/EU_SCORES/New_runs/$case"
 WPS_dir="$case_dir/WPS"
 mkdir -p $WPS_dir

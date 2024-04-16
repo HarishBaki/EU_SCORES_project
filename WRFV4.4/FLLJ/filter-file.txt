@@ -1,0 +1,7 @@
+# Filters the following patterns
+- met_em.d01.*
++ *.d01.*
++ *_d01_*
++ wrfout_d01_*
++ auxwrfout_d01_*
+- *
