@@ -178,3 +178,7 @@ WRFV4.4/EU_SCORES/New_runs/Portugal_coast/Postprocessed/
 WRFV4.4/EU_SCORES/New_runs/Netherlands_coast/Postprocessed/
 Reports/
 CERRA/
+
+WRFV4.4/FLLJ/LIDARS*/
+WRFV4.4/FLLJ/**/*.xlsx
+WRFV4.4/FLLJ/**/*.csv
