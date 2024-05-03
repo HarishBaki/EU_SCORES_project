@@ -25,21 +25,23 @@ function wait_for_completion {
 }
 
 # number_of_turbines are 182
-case=2
-for run in 3 4 6 7
-do
-    for j in $(seq 0 181)
+for case in 1 2
+    for run in 3 4 6 7
     do
-        # Wait until the number of running jobs is less than the maximum allowed
-        wait_for_completion
-        python compute_turbine_power.py $case $run $j "False" &
-        CURRENT_JOBS=$(jobs | wc -l)
-        echo $case $run $j
+        for j in $(seq 0 181)
+        do
+            # Wait until the number of running jobs is less than the maximum allowed
+            wait_for_completion
+            python compute_turbine_power.py $case $run $j "False" &
+            CURRENT_JOBS=$(jobs | wc -l)
+            echo $case $run $j
+        done
+        wait
+        # Combine the weibull parameters along individual south_north direciton and all west_east direction.
+        python compute_turbine_power.py $case $run 0 "True" 
+        echo $case $run
+        wait
     done
-    wait
-    # Combine the weibull parameters along individual south_north direciton and all west_east direction.
-    python compute_turbine_power.py $case $run 0 "True" 
-    echo $case $run
     wait
 done
 wait

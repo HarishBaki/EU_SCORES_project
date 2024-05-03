@@ -78,8 +78,8 @@ def extract_u_v(root_dir, case_dir,run,dates_range=None,levels=None,location=Non
                     u_data = u_data.sel(level=levels)
                     v_data = v_data.sel(level=levels)
                 else:
-                    u_data = u_data.interp(level=100.,method='linear')
-                    v_data = v_data.interp(level=100.,method='linear')
+                    u_data = u_data.interp(level=levels,method='linear')
+                    v_data = v_data.interp(level=levels,method='linear')
     else:
         run_dir = f'WRF_run_{run}'
         file = glob.glob(f'{root_dir}/{case_dir}/{run_dir}/auxhist22_{domains[run-1]}*')[0]
@@ -115,8 +115,8 @@ def extract_u_v(root_dir, case_dir,run,dates_range=None,levels=None,location=Non
                     u_data = u_data.sel(num_z_levels_stag=levels)
                     v_data = v_data.sel(num_z_levels_stag=levels)
                 else:
-                    u_data = u_data.interp(num_z_levels_stag=100.,method='linear')
-                    v_data = v_data.interp(num_z_levels_stag=100.,method='linear')
+                    u_data = u_data.interp(num_z_levels_stag=levels,method='linear')
+                    v_data = v_data.interp(num_z_levels_stag=levels,method='linear')
     
     return u_data, v_data, XLONG, XLAT
 
