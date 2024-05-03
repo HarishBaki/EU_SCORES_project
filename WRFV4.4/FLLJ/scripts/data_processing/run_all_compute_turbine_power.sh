@@ -26,6 +26,7 @@ function wait_for_completion {
 
 # number_of_turbines are 182
 for case in 1 2
+do
     for run in 3 4 6 7
     do
         for j in $(seq 0 181)
