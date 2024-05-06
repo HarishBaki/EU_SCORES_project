@@ -13,11 +13,12 @@ from data_processing.libraries import *
 case = int(sys.argv[1])
 case_dir = f'FLLJ_{case}'
 run = int(sys.argv[2])
-run_dir = f'WRF_run_{run}'
-j = int(sys.argv[3])
-combine = sys.argv[4]
+run_dir = sys.argv[3]
+j = int(sys.argv[4])
+combine = sys.argv[5]
 
-event_periods = [['2016-02-21T18:00','2016-02-22T18:00'],['2016-03-03T18:00','2016-03-04T18:00']] # don't put seconds in the time string
+event_periods = [['2016-02-21T18:00','2016-02-22T18:00'],['2016-03-03T18:00','2016-03-04T18:00'],
+                 ['2016-02-0-T03:00','2016-02-0-T15:00'],] # don't put seconds in the time string
 
 if __name__ == '__main__':
     if combine == 'False':
@@ -25,7 +26,7 @@ if __name__ == '__main__':
         location = [turbine_lats[j],turbine_lons[j]]
         power_curve = power_curves[turbine_types[j]-1]
         levels = hub_heights[turbine_types[j]-1]
-        u,v,XLONG,XLAT = extract_u_v(root_dir,case_dir,run,dates_range,levels,location)
+        u,v,XLONG,XLAT = extract_u_v(root_dir,case_dir,run,run_dir,dates_range,levels,location)
         ws = wind_speed(u,v)
         power_output = turbine_power(ws,power_curve.values)
 

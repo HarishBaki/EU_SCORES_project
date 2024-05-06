@@ -13,6 +13,7 @@ from data_processing.libraries import *
 case = int(sys.argv[1])
 case_dir = f'FLLJ_{case}'
 run = int(sys.argv[2])
+run_dir = sys.argv[3]
 event_periods = [['2016-02-21T18:00','2016-02-22T18:00'],['2016-03-03T18:00','2016-03-04T18:00']] # don't put seconds in the time string
 
 if __name__ == '__main__':
@@ -24,14 +25,14 @@ if __name__ == '__main__':
     
     dates_range = event_periods[case-1]
     if run == 1 or run == 2 or run == 5 or run == 8:
-        overall_power = extract_POWER(root_dir, case_dir,run,dates_range)
+        overall_power = extract_POWER(root_dir, case_dir,run,run_dir,dates_range)
         # Save the data
         # remove file if exist
         try:
-            os.remove(f'{root_dir}/{case_dir}/WRF_run_{run}/turbine_power.nc')
+            os.remove(f'{root_dir}/{case_dir}/{run_dir}/turbine_power.nc')
         except:
             pass
-        overall_power.to_netcdf(f'{root_dir}/{case_dir}/WRF_run_{run}/turbine_power.nc')
+        overall_power.to_netcdf(f'{root_dir}/{case_dir}/{run_dir}/turbine_power.nc')
 
     client.close()
     cluster.close()

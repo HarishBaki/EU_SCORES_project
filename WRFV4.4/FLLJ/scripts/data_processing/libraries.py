@@ -35,7 +35,7 @@ def find_nearest_indice(ds_lat,ds_lon,target_lat=None, target_lon=None, lon_conv
 
 
 # For the 8th simulation of FLLJ_1, the data is taken from uvmet_interp.nc file
-def extract_u_v(root_dir, case_dir,run,dates_range=None,levels=None,location=None):
+def extract_u_v(root_dir, case_dir,run, run_dir,dates_range=None,levels=None,location=None):
     '''
     root_dir: str, root directory of the WRF output files
     case_dir: str, case directory
@@ -46,7 +46,6 @@ def extract_u_v(root_dir, case_dir,run,dates_range=None,levels=None,location=Non
     '''
     from scipy.interpolate import interp1d
     if case_dir == 'FLLJ_1' and run == 8:
-        run_dir = f'WRF_run_{run}'
         file = glob.glob(f'{root_dir}/{case_dir}/{run_dir}/uvmet_interp*')[0]
         chunks={"Time": 1,"south_north": -1,"west_east": -1}
         ds = xr.open_dataset(file,chunks=chunks)
@@ -81,7 +80,6 @@ def extract_u_v(root_dir, case_dir,run,dates_range=None,levels=None,location=Non
                     u_data = u_data.interp(level=levels,method='linear')
                     v_data = v_data.interp(level=levels,method='linear')
     else:
-        run_dir = f'WRF_run_{run}'
         file = glob.glob(f'{root_dir}/{case_dir}/{run_dir}/auxhist22_{domains[run-1]}*')[0]
         chunks={"Time": 1,"south_north": -1,"west_east": -1}
         ds = xr.open_dataset(file,chunks=chunks)
@@ -166,8 +164,7 @@ def turbine_power(wind,power_curve):
     power = xr.where(((wind>=power_curve[0, 0]) & (wind<= power_curve[-1, 0])), power, 0)   #change it to np.where, if you encounter any error
     return xr.DataArray(power,name='power')
 
-def extract_POWER(root_dir, case_dir,run,dates_range=None):
-    run_dir = f'WRF_run_{run}'
+def extract_POWER(root_dir, case_dir,run, run_dir,dates_range=None):
     file = glob.glob(f'{root_dir}/{case_dir}/{run_dir}/wrfout_{domains[run-1]}*')[0]
     chunks={"Time": 1,"south_north": -1,"west_east": -1}
     ds = xr.open_dataset(file,chunks=chunks)

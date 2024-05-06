@@ -181,4 +181,5 @@ CERRA/
 
 WRFV4.4/FLLJ/LIDARS*/
 WRFV4.4/FLLJ/**/*.xlsx
+WRFV4.4/FLLJ/**/*.xls
 WRFV4.4/FLLJ/**/*.csv
