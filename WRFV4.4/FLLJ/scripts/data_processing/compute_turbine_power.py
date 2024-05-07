@@ -18,7 +18,8 @@ j = int(sys.argv[4])
 combine = sys.argv[5]
 
 event_periods = [['2016-02-21T18:00','2016-02-22T18:00'],['2016-03-03T18:00','2016-03-04T18:00'],
-                 ['2016-02-0-T03:00','2016-02-0-T15:00'],] # don't put seconds in the time string
+                 ['2016-02-09-T00:00','2016-02-10-T00:00'],['2017-01-09-T12:00','2017-01-10-T12:00'],
+                 ['2017-01-29-T12:00','2017-01-30-T12:00']] # don't put seconds in the time string
 
 if __name__ == '__main__':
     if combine == 'False':

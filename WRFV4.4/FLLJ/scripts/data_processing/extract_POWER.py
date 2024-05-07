@@ -14,8 +14,9 @@ case = int(sys.argv[1])
 case_dir = f'FLLJ_{case}'
 run = int(sys.argv[2])
 run_dir = sys.argv[3]
-event_periods = [['2016-02-21T18:00','2016-02-22T18:00'],['2016-03-03T18:00','2016-03-04T18:00']] # don't put seconds in the time string
-
+event_periods = [['2016-02-21T18:00','2016-02-22T18:00'],['2016-03-03T18:00','2016-03-04T18:00'],
+                 ['2016-02-09-T00:00','2016-02-10-T00:00'],['2017-01-09-T12:00','2017-01-10-T12:00'],
+                 ['2017-01-29-T12:00','2017-01-30-T12:00']] # don't put seconds in the time string
 if __name__ == '__main__':
     # Connect to the dask cluster
     import dask.distributed as dd
