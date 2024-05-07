@@ -1,14 +1,15 @@
 #!/bin/bash
 # This script runs all the scripts needed to compute the turbine power
 # for the WRF simulations.
-: '
+
 for case in 1 2
 do
-    for run in 1 8; do
+    for run in 8; do
         run_dir="WRF_run_$run"
         python extract_POWER.py $case $run $run_dir
         echo $case $run $run_dir
     done
+    : '
     for run in 2 5
     do
         run_dir="WRF_run_$run"
@@ -18,8 +19,9 @@ do
         python extract_POWER.py $case $run $run_dir
         echo $case $run $run_dir
     done
+    '
 done
-
+: '
 for case in 3
 do
     for run in 5; do
@@ -80,7 +82,7 @@ do
     done
     wait
 done
-'
+
 for case in 3
 do
     for run in 7
@@ -102,7 +104,7 @@ do
     done
     wait
 done
-
+'
 wait
 
 echo "All done"
