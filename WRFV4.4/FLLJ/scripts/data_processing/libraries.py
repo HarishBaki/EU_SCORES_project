@@ -9,7 +9,7 @@ root_dir = '/media/harish/SSD_4TB/EU_SCORES_project/WRFV4.4/FLLJ'
 domains = ['d03', 'd02', 'd02', 'd02','d01','d02','d01','d03']
 event_periods = [['2016-02-21T18:00','2016-02-22T18:00'],['2016-03-03T18:00','2016-03-04T18:00'],
                  ['2016-02-09-T00:00','2016-02-10-T00:00'],['2017-01-09-T12:00','2017-01-10-T12:00'],
-                 ['2017-01-29-T12:00','2017-01-30-T12:00']] # don't put seconds in the time string
+                 ['2017-01-29-T18:00','2017-01-30-T18:00']] # don't put seconds in the time string
 ramp_periods = [['2016-02-22T01:00','2016-02-22T12:00'],['2016-03-04T02:00','2016-03-04T13:00'],
                 ['2016-02-09-T03:00','2016-02-09-T14:00'],['2017-01-09-T18:00','2017-01-10-T06:00'],
                  ['2017-01-30-T01:00','2017-01-30-T12:00']]
@@ -49,7 +49,7 @@ def extract_u_v(root_dir, case_dir,run, run_dir,dates_range=None,levels=None,loc
     location: list of two floats, latitude and longitude of the location to extract
     '''
     from scipy.interpolate import interp1d
-    if case_dir == 'FLLJ_1' and run == 8:
+    if (case_dir == 'FLLJ_1' and run == 8) or (case_dir == 'FLLJ_1' and run == 15) or (case_dir == 'FLLJ_2' and run == 15):
         file = glob.glob(f'{root_dir}/{case_dir}/{run_dir}/uvmet_interp*')[0]
         chunks={"Time": 1,"south_north": -1,"west_east": -1}
         ds = xr.open_dataset(file,chunks=chunks)
@@ -182,22 +182,68 @@ def extract_POWER(root_dir, case_dir,run, run_dir,dates_range=None):
     POWER = ds.POWER.sum(dim='south_north').sum(dim='west_east')
     return POWER
 
+def D(O,M):
+    '''
+    O: observed data
+    M: model data
+    returns the difference between the observed and model data
+    '''
+    return (M-O)
+
 def NRMSE(O,M):
-    BIAS = (O-M)
-    RMSE = np.sqrt(np.mean(BIAS**2))
+    '''
+    O: observed data
+    M: model data
+    returns the normalized root mean square error
+    '''
+    RMSE = np.sqrt(np.mean(D(O,M)**2))
     var1 = np.var(O)
     var2 = np.var(M)
     return RMSE/np.sqrt(var1+var2)
 
 def NBIAS(O,M):
-    BIAS = (O-M)
-    return np.mean(BIAS)/np.var(BIAS)
+    '''
+    O: observed data
+    M: model data
+    returns the normalized bias
+    '''
+    return np.mean(D(O,M))/np.std(D(O,M))
 
-def NPE(O,M):
-    BIAS = (O-M)
+def NEV(O,M):
+    '''
+    O: observed data
+    M: model data
+    returns the normalized error variance
+    '''
     var1 = np.var(O)
     var2 = np.var(M)
-    return np.var(BIAS)/(var1+var2)
+    return (np.var(D(O,M)))/(var2+var1)
+
+def NPE(O,M):
+    '''
+    O: observed data
+    M: model data
+    returns the normalized pattern error, which is the sqrt of the normalized error variance
+    '''
+    return np.sqrt(NEV(O,M))
+
+def rho(O,M):
+    '''
+    O: observed data
+    M: model data
+    returns the correlation coefficient, implying a phase error
+    '''
+    return np.corrcoef(O,M)[0,1]
+
+def eta(O,M):
+    '''
+    O: observed data
+    M: model data
+    returns the amplitude error
+    '''
+    var1 = np.var(O)
+    var2 = np.var(M)
+    return (np.sqrt(var1*var2))/(0.5*(var1+var2))
 
 def Taylor_Skill_Score(O,M):
     std1 = np.std(O)
@@ -205,3 +251,20 @@ def Taylor_Skill_Score(O,M):
     SDR = std2/std1
     CC = np.corrcoef(O,M)[0,1]
     return 4*(1+CC)**2/((1+0.99999)**2*((SDR+(1/SDR))**2))
+
+def T_metric(O,M):
+    '''
+    O: observed data
+    M: model data
+    returns the T-metric
+    https://journals.ametsoc.org/view/journals/hydr/18/10/jhm-d-17-0045_1.xml?tab_body=abstract-display
+    '''
+    R = np.corrcoef(O,M)[0,1]
+    MSE = np.mean(D(O,M)**2)
+    bias = np.mean(D(O,M))
+    std1 = np.std(O)
+    std2 = np.std(M)
+
+    T = ((1+R)/2)*(1-(MSE/(bias**2+std1**2+std2**2)))
+
+    return T
