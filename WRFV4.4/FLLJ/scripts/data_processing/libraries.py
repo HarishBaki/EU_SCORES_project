@@ -6,7 +6,7 @@ import time
 import glob
 
 root_dir = '/media/harish/SSD_4TB/EU_SCORES_project/WRFV4.4/FLLJ'
-domains = ['d03', 'd02', 'd02', 'd02','d01','d02','d01','d03']
+domains = ['d03', 'd02', 'd02', 'd02','d01','d02','d01','d03','d02', 'd02', 'd02','d01','d02','d01','d01']
 event_periods = [['2016-02-21T18:00','2016-02-22T18:00'],['2016-03-03T18:00','2016-03-04T18:00'],
                  ['2016-02-09-T00:00','2016-02-10-T00:00'],['2017-01-09-T12:00','2017-01-10-T12:00'],
                  ['2017-01-29-T18:00','2017-01-30-T18:00']] # don't put seconds in the time string
@@ -49,7 +49,7 @@ def extract_u_v(root_dir, case_dir,run, run_dir,dates_range=None,levels=None,loc
     location: list of two floats, latitude and longitude of the location to extract
     '''
     from scipy.interpolate import interp1d
-    if (case_dir == 'FLLJ_1' and run == 8) or (case_dir == 'FLLJ_1' and run == 15) or (case_dir == 'FLLJ_2' and run == 15):
+    if (case_dir == 'FLLJ_1' and run == 8):
         file = glob.glob(f'{root_dir}/{case_dir}/{run_dir}/uvmet_interp*')[0]
         chunks={"Time": 1,"south_north": -1,"west_east": -1}
         ds = xr.open_dataset(file,chunks=chunks)
