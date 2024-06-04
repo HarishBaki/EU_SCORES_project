@@ -185,3 +185,4 @@ WRFV4.4/FLLJ/**/*.xls
 WRFV4.4/FLLJ/**/*.csv
 WRFV4.4/FLLJ/figures*/
 WRFV4.4/FLLJ/**/*.nc
+/**/*.nc
