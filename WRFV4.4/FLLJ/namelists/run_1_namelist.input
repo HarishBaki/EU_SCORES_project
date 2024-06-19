@@ -22,9 +22,13 @@
  io_form_input                       = 2
  io_form_boundary                    = 2
  debug_level                         = 50
+ 
+ !For SST updating (used only with sst_update=1):
  auxinput4_inname                    = "wrflowinp_d<domain>"
  auxinput4_interval                  = 360, 360, 360, 360,
  io_form_auxinput4                   = 2,
+ 
+ ! Save outputs at z_levels  
  auxhist22_interval 				 = 360,360,5,5, !corresponds to the heightlevel diagnostics, in minutes
  frames_per_auxhist22 				 = 10000,10000,10000,10000,
  io_form_auxhist22 					 = 2

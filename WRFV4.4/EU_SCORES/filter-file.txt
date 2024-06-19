@@ -1,0 +1,3 @@
+# Filters the following patterns
++ auxhist22_d01_*
+- *
