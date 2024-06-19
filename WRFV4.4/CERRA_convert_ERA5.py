@@ -95,9 +95,11 @@ variable_names = ['10 metre wind speed','10 metre wind direction']
 for grb1,grb2 in zip(grbs.select(name=variable_names[0]),grbs.select(name=variable_names[1])): #why in combination? Because, grib reads line wise, which means, one data point at a time.
     print(grb1,grb2)
     wspd = grb1.values
-    wdir_deg = np.radians(grb2.values)
-    U10 = -grb1.values*np.sin(wdir_deg)
-    V10 = -grb1.values*np.cos(wdir_deg)
+    wdir_rad = np.radians(grb2.values)  
+    # the following calculations are based on https://confluence.ecmwf.int/pages/viewpage.action?pageId=133262398
+    # wdir must be in radians, as computed above
+    U10 = -wspd*np.sin(wdir_rad)
+    V10 = -wspd*np.cos(wdir_rad)
 
     grb_U10 = grb1
     grb_U10.values = U10
