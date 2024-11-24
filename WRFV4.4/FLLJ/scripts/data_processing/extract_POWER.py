@@ -4,7 +4,7 @@ import numpy as np
 import time
 import glob, sys, os
 
-root_dir = '/media/harish/SSD_4TB/EU_SCORES_project/WRFV4.4/FLLJ/'
+root_dir = '/media/ssd_4tb_qvo/EU_SCORES_project/WRFV4.4/FLLJ/'
 scripts_dir = f'{root_dir}/scripts'
 sys.path.append(scripts_dir)
 
