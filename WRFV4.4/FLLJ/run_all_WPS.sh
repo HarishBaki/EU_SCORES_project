@@ -1,16 +1,16 @@
 WPS_source_dir=/media/sukanta/HD2/WRF/WRFV4.4/WPS # this is the WPS installation directory
 
-root_dir='/media/harish/SSD_4TB/EU_SCORES_project/WRFV4.4/FLLJ'
-start_dates=('2016-02-21_12:00:00' '2016-03-03_12:00:00' '2016-02-08_18:00:00' '2017-01-09_06:00:00' '2017-01-29_12:00:00')
+root_dir='/media/ssd_4tb_qvo/EU_SCORES_project/WRFV4.4/FLLJ'
+start_dates=('2016-02-21_06:00:00' '2016-03-03_06:00:00' '2016-02-08_18:00:00' '2017-01-09_06:00:00' '2017-01-29_12:00:00')
 end_dates=('2016-02-22_18:00:00' '2016-03-04_18:00:00' '2016-02-10_00:00:00' '2017-01-10_12:00:00' '2017-01-30_18:00:00')
 cases=('FLLJ_1' 'FLLJ_2' 'FLLJ_3' 'FLLJ_4' 'FLLJ_5')
-#for (( i=3; i<${#cases[@]}; i++ ));
+#for (( i=3; i<${#cases[@]}; i++ )); # remember, 0 means FLLJ_1
 for i in 2;
 do
     case=${cases[$i]}
     echo $case
     # there are folders in the WPS directory, which are ends with _geogrid. read them
-    runs=('run_5' 'run_7')     # actual runs ('run_1' 'run_2,3,4' 'run_5' 'run_6' 'run_7' 'run_8')
+    runs=('run_2,3,4')     # actual runs ('run_1' 'run_2,3,4' 'run_5' 'run_6' 'run_7' 'run_8')
     # loop over the geogrid_dirs
     for run in ${runs[@]};
     do
