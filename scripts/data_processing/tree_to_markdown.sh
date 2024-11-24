@@ -2,8 +2,6 @@
 root_dir=$(pwd)
 cd "$root_dir/$1" || exit 1
 
-#!/bin/bash
-
 #File: tree-md
 
 tree=$(tree -tf --noreport -I '*~' --charset ascii . |
