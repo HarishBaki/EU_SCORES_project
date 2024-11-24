@@ -25,7 +25,7 @@ if __name__ == '__main__':
     print(client)
     
     dates_range = event_periods[case-1]
-    if run == 1 or run == 2 or run == 5 or run == 8:
+    if run == 1 or run == 2 or run == 5 or run == 8 or run == 9 or run == 12 or run == 16 or run == 17:
         overall_power = extract_POWER(root_dir, case_dir,run,run_dir,dates_range)
         # Save the data
         # remove file if exist
