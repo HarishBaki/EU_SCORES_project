@@ -5,10 +5,6 @@ import numpy as np
 # certifiate verification
 import certifi
 import urllib3
-http = urllib3.PoolManager(
-    cert_reqs='CERT_REQUIRED',
-    ca_certs=certifi.where()
-)
 
 
 # This function takes input arguments through command lines 
@@ -24,18 +20,18 @@ month = sys.argv[3]
 day = sys.argv[4]
 time = sys.argv[5] # convert time into two digit format
 
-
 # if time is divisible by 3, then product_type = "analysis", else product_type = "forecast
 if int(time)%3 == 0:
     product_type = "analysis"
     hour = int(time)
+    print(year,month,day,time,product_type, hour)
+
 else:
     product_type = "forecast"
     # convert time into nearest multiple of 3
     leadtime_hour = int(time)%3
     hour = str(int(int(time)/3)*3)
-
-print(year,month,day,time,product_type,leadtime_hour)
+    print(year,month,day,time,product_type,hour, leadtime_hour)
 
 #--- Change values of year, month, day, and time only ---#
 
