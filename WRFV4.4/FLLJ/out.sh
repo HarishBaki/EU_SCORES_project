@@ -1,12 +1,9 @@
-case='Germany_coast'	#Change here for the region
-i=2192				#Change here for run begin	
-j=2265		#Change here for run end
-while [ $i -le $j ] #Change this to make real.exe work
-do
-	DIR='WRF_'$i
-	cd $DIR
-		tail -1 rsl.out.0000
-	cd ..
-	echo 'Done '$DIR    
-	((i++))
+cases=('FLLJ_1' 'FLLJ_2' 'FLLJ_3' 'FLLJ_4' 'FLLJ_5')
+for ((i=3;i<${#cases[@]};++i)); do
+	case=${cases[$i]}
+	for run in $(seq 2 4); do
+		run_dir=$case/WRF_run_$run
+		echo $run_dir
+		tail -1 $run_dir/rsl.out.0000
+	done
 done

@@ -1,7 +1,8 @@
 # Filters the following patterns
-- met_em.d01.*
-+ *.d01.*
-+ *_d01_*
-+ wrfout_d01_*
-+ auxwrfout_d01_*
+- met_em.d0*
++ *.d0*
++ *_d0*
++ wrfout_d0*
++ auxwrfout_d0*
++ namelist.input
 - *

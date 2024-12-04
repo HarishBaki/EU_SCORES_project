@@ -4,8 +4,7 @@ root_dir='/media/ssd_4tb_qvo/EU_SCORES_project/WRFV4.4/FLLJ'
 start_dates=('2016-02-21_06:00:00' '2016-03-03_06:00:00' '2016-02-08_18:00:00' '2017-01-09_06:00:00' '2017-01-29_12:00:00')
 end_dates=('2016-02-22_18:00:00' '2016-03-04_18:00:00' '2016-02-10_00:00:00' '2017-01-10_12:00:00' '2017-01-30_18:00:00')
 cases=('FLLJ_1' 'FLLJ_2' 'FLLJ_3' 'FLLJ_4' 'FLLJ_5')
-#for (( i=3; i<${#cases[@]}; i++ )); # remember, 0 means FLLJ_1
-for i in 2;
+for (( i=3; i<${#cases[@]}; i++ )); # remember, 0 means FLLJ_1
 do
     case=${cases[$i]}
     echo $case

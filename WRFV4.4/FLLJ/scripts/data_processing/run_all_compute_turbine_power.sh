@@ -2,19 +2,19 @@
 # This script runs all the scripts needed to compute the turbine power
 # for the WRF simulations.
 
-
+: '
 # This loop extracts the POWER data from the MYNN simulations, which inherently compute the power from turbine models. 
 for case in 1 2; do  # this loop is for the cases 1 and 2
     # This is loop for simulations with 3 hr CERRA data and 1 hr CERRA data
-    for run in 1 2 5 8 9 12 16 17; do  # this loop is for the runs 1, 2, 5, 8, 9, 12, 16, 17
+    for run in 16 17; do  # this loop is for the runs 1, 2, 5, 8, 9, 12, 16, 17
         run_dir="WRF_run_$run"
         python extract_POWER.py $case $run $run_dir
         echo $case $run $run_dir
     done
 done
-
-for case in 3; do   # this loop is for the case 3
-    for run in 2 5; do
+'
+for case in 4 5; do   # this loop is for the case 3
+    for run in 2; do #This loop is for the runs 2 5
         run_dir="WRF_run_$run"
         python extract_POWER.py $case $run $run_dir
         echo $case $run $run_dir
@@ -34,10 +34,11 @@ function wait_for_completion {
     done
 }
 
+: '
 # number_of_turbines are 182
 for case in 1 2; do 
     # This is loop for simulations with 3 hr CERRA data and 1 hr CERRA data
-    for run in 3 4 6 7 10 11 13 14 15; do   # this loop is for the runs 3, 4, 6, 7, 15
+    for run in 3 4 6 7 10 11 13 14 15; do   # this loop is for the runs 3 4 6 7 10 11 13 14 15
         run_dir="WRF_run_$run"
         for j in $(seq 0 181)
         do
@@ -56,8 +57,9 @@ for case in 1 2; do
     wait
 done
 wait
+'
 
-for case in 3; do   
+for case in 4 5; do   
     # This is loop for simulations with 3 hr CERRA data
     for run in 3 4; do  # this loop is for the runs 3, 4, 
         run_dir="WRF_run_$run"
