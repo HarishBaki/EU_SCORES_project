@@ -1,8 +1,8 @@
 root_dir=$(pwd)
 Udrive_dir="EU_SCORES_project/WRFV4.4/FLLJ"
-start_dates=('2016-02-21 12' '2016-03-03 12')
-end_dates=('2016-02-22 18' '2016-03-04 18')
-cases=('FLLJ_1' 'FLLJ_2')
+start_dates=('2016-02-21 12' '2016-03-03 12' '2016-02-08 18' '2017-01-09 06' '2017-01-29 12')
+end_dates=('2016-02-22 18' '2016-03-04 18' '2016-02-10 00' '2017-01-10 12' '2017-01-30 18')
+cases=('FLLJ_1' 'FLLJ_2' 'FLLJ_3' 'FLLJ_4' 'FLLJ_5')
 for ((i=0;i<${#cases[@]};++i)); do
 	case=${cases[$i]}
 	start_date=${start_dates[$i]}
